@@ -49,7 +49,8 @@ cp .env.example .env
 python scripts/ingest.py
 
 # 4. Launch the app
-streamlit run src/ui/app.py
+cd frontend && npm install && npm run dev  # Frontend on :3000
+python -m uvicorn src.api.main:app --port 8000  # API on :8000
 ```
 
 Or use the all-in-one setup script:
@@ -67,7 +68,7 @@ python scripts/setup.py
 ## How It Works
 
 ### The Demo (Two Columns)
-The Streamlit UI shows **two answers side by side** for every question:
+The UI shows **two answers side by side** for every question:
 
 | **Basic RAG** | **Ontology Enhanced RAG** |
 |---|---|

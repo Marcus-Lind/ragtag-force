@@ -4,7 +4,7 @@
 An ontology enhanced RAG system for military benefits and entitlements navigation.
 Core thesis: a SKOS ontology layer improves RAG retrieval quality over naive vector
 search by expanding queries with synonyms, hierarchy, and concept-to-document mappings.
-The Streamlit UI must always show BOTH answers side by side so the delta is visible.
+The Next.js UI must always show BOTH answers side by side so the delta is visible.
 
 ## Stack — Use Nothing Else
 - LLM: Anthropic (Claude Haiku 3.5), API key via .env
@@ -14,7 +14,7 @@ The Streamlit UI must always show BOTH answers side by side so the delta is visi
 - RAG orchestration: LlamaIndex (NOT LangChain)
 - Structured data: SQLite via pandas + sqlite3, files in ./data/structured/
 - PDF parsing: PyMuPDF (fitz)
-- Frontend: Streamlit, single file at src/ui/app.py
+- Frontend: Next.js + shadcn/ui, files in frontend/
 - Python 3.11+
 
 ## Architecture
@@ -23,7 +23,7 @@ Query -> Entity Extraction -> Ontology Expansion -> [Vector Search + Structured 
 ## Non-Negotiable Design Rules
 1. NEVER embed rate tables (BAH, pay charts, per diem). Query SQLite directly.
 2. ALWAYS add source citations to LLM answers (document name + section number).
-3. Streamlit UI MUST show two columns: basic RAG answer vs ontology enhanced answer.
+3. Next.js UI MUST show two columns: basic RAG answer vs ontology enhanced answer.
    The delta between these two columns is the entire demo. Never remove this.
 4. All file paths use pathlib.Path. No hardcoded strings.
 5. All functions have docstrings. All modules have type hints.

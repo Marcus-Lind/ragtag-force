@@ -93,7 +93,8 @@ def main() -> None:
     print(f"{'=' * 60}")
     print("\n  To launch the app:")
     print(f"    cd {_project_root}")
-    print("    streamlit run src/ui/app.py")
+    print("    python -m uvicorn src.api.main:app --port 8000  # API")
+    print("    cd frontend && npm run dev                      # UI on :3000")
     print("\n  Make sure ANTHROPIC_API_KEY is set in .env")
     print()
 
