@@ -20,6 +20,7 @@ if str(_project_root) not in sys.path:
 from src.config import ANTHROPIC_API_KEY, SQLITE_PATH
 from src.llm.client import LLMClient
 from src.llm.generator import generate_naive_answer, generate_enhanced_answer
+from src.llm.tdy_generator import generate_tdy_naive_answer, generate_tdy_enhanced_answer
 
 app = FastAPI(
     title="RAG-Tag Force API",
@@ -267,3 +268,125 @@ EXAMPLE_QUESTIONS = [
 async def examples() -> list[str]:
     """Return example questions."""
     return EXAMPLE_QUESTIONS
+
+
+# ── TDY Travel Domain ──────────────────────────────────────────────────────
+
+def _tdy_answer_to_result(tdy_answer: Any, original_query: str) -> AnswerResult:
+    """Convert a TDYRAGAnswer dataclass to an API response model."""
+    structured_data = []
+    if tdy_answer.retrieval.structured_data:
+        for k, v in tdy_answer.retrieval.structured_data.items():
+            structured_data.append(StructuredDataItem(key=k, value=str(v)))
+
+    expansion = None
+    expanded_query = ""
+    if tdy_answer.retrieval.expansion:
+        exp = tdy_answer.retrieval.expansion
+        expansion = ExpansionDetail(
+            synonyms=exp.synonyms or {},
+            related_regulations=exp.related_regulations or [],
+            locality_codes=exp.location_codes or [],
+            grade_notations=[],
+            dependency_statuses=[],
+        )
+        expanded_query = exp.expanded_query
+
+    distances = [
+        d.get("distance")
+        for d in tdy_answer.retrieval.documents
+        if d.get("distance") is not None
+    ]
+    avg_dist = sum(distances) / len(distances) if distances else None
+
+    # Build pipeline trace
+    trace: list[PipelineStep] = []
+    is_enhanced = tdy_answer.is_enhanced
+
+    trace.append(PipelineStep(label="Input Query", detail=original_query))
+
+    if is_enhanced and tdy_answer.retrieval.expansion:
+        ent = tdy_answer.retrieval.expansion.entities
+        trace.append(PipelineStep(
+            label="TDY Entity Extraction",
+            detail=f"Found {len(ent.locations) if ent else 0} locations, "
+                   f"{len(ent.allowances) if ent else 0} allowances, "
+                   f"{len(ent.transport_modes) if ent else 0} transport modes",
+            highlight=True,
+        ))
+        trace.append(PipelineStep(
+            label="SKOS Expansion",
+            detail=f"Query expanded with {len(tdy_answer.retrieval.expansion.expanded_terms)} terms",
+            highlight=True,
+        ))
+
+    search_q = expanded_query if is_enhanced else original_query
+    trace.append(PipelineStep(
+        label="Vector Search (JTR)",
+        detail=f"Searched {len(tdy_answer.retrieval.documents)} docs (avg distance: {avg_dist:.3f})" if avg_dist else f"Retrieved {len(tdy_answer.retrieval.documents)} documents",
+    ))
+
+    if is_enhanced and structured_data:
+        trace.append(PipelineStep(
+            label="Per Diem Lookup",
+            detail=f"Found {len(structured_data)} fields from GSA rate tables",
+            highlight=True,
+        ))
+    elif not is_enhanced:
+        trace.append(PipelineStep(
+            label="Per Diem Lookup",
+            detail="Skipped — basic pipeline has no location awareness",
+        ))
+
+    trace.append(PipelineStep(
+        label="LLM Generation",
+        detail=f"Claude Haiku with {len(tdy_answer.retrieval.documents)} context docs" +
+               (f" + {len(structured_data)} data fields" if structured_data else ""),
+    ))
+
+    return AnswerResult(
+        answer=tdy_answer.answer,
+        error=tdy_answer.error,
+        retrieval_time_ms=tdy_answer.retrieval.retrieval_time_ms,
+        document_count=len(tdy_answer.retrieval.documents),
+        sources=tdy_answer.sources,
+        structured_data=structured_data,
+        expansion=expansion,
+        search_query=search_q[:300],
+        avg_distance=avg_dist,
+        pipeline_trace=trace,
+    )
+
+
+@app.post("/api/tdy/query", response_model=QueryResponse)
+async def tdy_query(request: QueryRequest) -> QueryResponse:
+    """Run both basic and Ontology Enhanced RAG pipelines for a TDY travel query."""
+    start = time.time()
+    client = LLMClient()
+
+    naive_result = generate_tdy_naive_answer(request.query, client=client)
+    enhanced_result = generate_tdy_enhanced_answer(request.query, client=client)
+
+    total_ms = (time.time() - start) * 1000
+
+    return QueryResponse(
+        query=request.query,
+        naive=_tdy_answer_to_result(naive_result, request.query),
+        enhanced=_tdy_answer_to_result(enhanced_result, request.query),
+        total_time_ms=total_ms,
+    )
+
+
+TDY_EXAMPLE_QUESTIONS = [
+    "What is the per diem rate for TDY travel to San Diego?",
+    "Can I drive my POV for TDY and get reimbursed for mileage?",
+    "What are the rules for long-term TDY per diem reduction?",
+    "How do I get a travel advance before my TDY trip?",
+    "What is the M&IE breakdown for a travel day?",
+]
+
+
+@app.get("/api/tdy/examples")
+async def tdy_examples() -> list[str]:
+    """Return TDY travel example questions."""
+    return TDY_EXAMPLE_QUESTIONS

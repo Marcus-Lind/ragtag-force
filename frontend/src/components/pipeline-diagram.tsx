@@ -1,11 +1,17 @@
-export function PipelineDiagram() {
+interface PipelineDiagramProps {
+  domain?: "benefits" | "tdy";
+}
+
+export function PipelineDiagram({ domain = "benefits" }: PipelineDiagramProps) {
+  const structuredLabel = domain === "tdy" ? "Per Diem Lookup" : "Structured Lookup";
+
   return (
     <div className="rounded-lg border bg-muted/30 px-5 py-4 mb-6 text-sm text-muted-foreground leading-loose">
       <div className="text-xs font-semibold uppercase tracking-wider text-foreground mb-2">
         Pipeline Architecture
       </div>
       <div className="flex flex-wrap items-center gap-1">
-        <span className="font-medium text-foreground">Naive:</span>
+        <span className="font-medium text-foreground">Basic:</span>
         <Step>Query</Step>
         <Arrow />
         <Step>Vector Search</Step>
@@ -24,7 +30,7 @@ export function PipelineDiagram() {
         <Arrow />
         <Step>Vector Search</Step>
         <span className="text-muted-foreground">+</span>
-        <Step accent>Structured Lookup</Step>
+        <Step accent>{structuredLabel}</Step>
         <Arrow />
         <Step>LLM</Step>
         <Arrow />

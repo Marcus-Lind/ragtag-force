@@ -8,9 +8,10 @@ interface QueryInputProps {
   examples: string[];
   onSubmit: (query: string) => void;
   loading: boolean;
+  placeholder?: string;
 }
 
-export function QueryInput({ examples, onSubmit, loading }: QueryInputProps) {
+export function QueryInput({ examples, onSubmit, loading, placeholder }: QueryInputProps) {
   const [query, setQuery] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -45,7 +46,7 @@ export function QueryInput({ examples, onSubmit, loading }: QueryInputProps) {
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ask about military benefits, pay, or entitlements..."
+          placeholder={placeholder || "Ask about military benefits, pay, or entitlements..."}
           className="flex-1"
           disabled={loading}
         />

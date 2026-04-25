@@ -65,6 +65,18 @@ def load_bas_rates(conn: sqlite3.Connection) -> int:
     return len(df)
 
 
+def load_perdiem_rates(conn: sqlite3.Connection) -> int:
+    """Load per diem rates CSV into the perdiem_rates table.
+
+    Returns:
+        Number of rows loaded.
+    """
+    csv_path = DATA_STRUCTURED_PATH / "perdiem_rates_2026.csv"
+    df = pd.read_csv(csv_path)
+    df.to_sql("perdiem_rates", conn, if_exists="replace", index=False)
+    return len(df)
+
+
 def load_all_structured_data(db_path: Path | None = None) -> dict[str, int]:
     """Load all structured CSV data into SQLite.
 
@@ -84,6 +96,7 @@ def load_all_structured_data(db_path: Path | None = None) -> dict[str, int]:
             "enlisted_base_pay": load_enlisted_base_pay(conn),
             "officer_base_pay": load_officer_base_pay(conn),
             "bas_rates": load_bas_rates(conn),
+            "perdiem_rates": load_perdiem_rates(conn),
         }
         conn.commit()
         return counts

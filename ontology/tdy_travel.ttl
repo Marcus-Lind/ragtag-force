@@ -1,0 +1,292 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex:   <http://ragtag-force.mil/ontology#> .
+
+# ============================================================================
+# RAG-Tag Force TDY Travel Ontology
+# SKOS-based ontology for query expansion in military TDY travel RAG system
+# ============================================================================
+
+# ── Top-Level Concept Scheme ────────────────────────────────────────────────
+ex:TDYTravel a skos:ConceptScheme ;
+    skos:prefLabel "TDY Travel Ontology"@en ;
+    skos:definition "SKOS ontology covering US military travel statuses, per diem zones, travel allowances, transport modes, and governing regulations for TDY travel planning."@en .
+
+# ── Concept Classes (Top Concepts) ──────────────────────────────────────────
+ex:TravelStatus a skos:Concept ;
+    skos:prefLabel "Travel Status"@en ;
+    skos:topConceptOf ex:TDYTravel ;
+    skos:definition "Types of military travel orders."@en .
+
+ex:TravelLocation a skos:Concept ;
+    skos:prefLabel "Travel Location"@en ;
+    skos:topConceptOf ex:TDYTravel ;
+    skos:definition "TDY destination cities and areas with per diem rates."@en .
+
+ex:TravelAllowance a skos:Concept ;
+    skos:prefLabel "Travel Allowance"@en ;
+    skos:topConceptOf ex:TDYTravel ;
+    skos:definition "Allowances and entitlements related to official travel."@en .
+
+ex:TransportMode a skos:Concept ;
+    skos:prefLabel "Transport Mode"@en ;
+    skos:topConceptOf ex:TDYTravel ;
+    skos:definition "Authorized transportation methods for official travel."@en .
+
+ex:TravelRegulation a skos:Concept ;
+    skos:prefLabel "Travel Regulation"@en ;
+    skos:topConceptOf ex:TDYTravel ;
+    skos:definition "Governing regulations for military travel."@en .
+
+# ── Travel Statuses ─────────────────────────────────────────────────────────
+ex:TDY a skos:Concept ;
+    skos:prefLabel "Temporary Duty"@en ;
+    skos:altLabel "TDY"@en, "Temporary Duty Travel"@en, "Temporary Duty Assignment"@en,
+                  "TD"@en, "Temp Duty"@en ;
+    skos:broader ex:TravelStatus ;
+    skos:definition "Travel away from permanent duty station for a temporary period."@en ;
+    skos:related ex:JTRChapter2, ex:PerDiem .
+
+ex:PCS a skos:Concept ;
+    skos:prefLabel "Permanent Change of Station"@en ;
+    skos:altLabel "PCS"@en, "PCS Move"@en, "PCS Orders"@en,
+                  "Permanent Duty Station Change"@en ;
+    skos:broader ex:TravelStatus ;
+    skos:definition "Relocation to a new permanent duty station."@en ;
+    skos:related ex:JTRChapter5, ex:DLA .
+
+ex:DeploymentTravel a skos:Concept ;
+    skos:prefLabel "Deployment Travel"@en ;
+    skos:altLabel "Deployment"@en, "Deploy"@en, "Deployment Orders"@en ;
+    skos:broader ex:TravelStatus ;
+    skos:definition "Travel in support of military deployment."@en .
+
+ex:PassTravel a skos:Concept ;
+    skos:prefLabel "Pass Travel"@en ;
+    skos:altLabel "Pass"@en, "Liberty"@en, "Weekend Pass"@en ;
+    skos:broader ex:TravelStatus ;
+    skos:definition "Short-duration authorized absence from duty."@en .
+
+# ── Travel Locations (Major TDY Destinations) ──────────────────────────────
+# Each location maps to a city/state for GSA per diem lookup
+
+ex:WashingtonDC a skos:Concept ;
+    skos:prefLabel "Washington DC"@en ;
+    skos:altLabel "DC"@en, "Washington"@en, "Pentagon"@en, "National Capital Region"@en,
+                  "NCR"@en, "Fort Myer"@en, "Fort McNair"@en, "Joint Base Myer-Henderson Hall"@en ;
+    skos:broader ex:TravelLocation ;
+    skos:notation "DC" ;
+    skos:definition "Washington DC metro area including Pentagon and DoD headquarters."@en .
+
+ex:SanDiego a skos:Concept ;
+    skos:prefLabel "San Diego"@en ;
+    skos:altLabel "Naval Base San Diego"@en, "NBSD"@en, "Camp Pendleton"@en,
+                  "MCAS Miramar"@en, "Naval Station San Diego"@en ;
+    skos:broader ex:TravelLocation ;
+    skos:notation "SAN_DIEGO_CA" ;
+    skos:definition "San Diego military complex including Naval Base and Camp Pendleton."@en .
+
+ex:SanAntonio a skos:Concept ;
+    skos:prefLabel "San Antonio"@en ;
+    skos:altLabel "JBSA"@en, "Joint Base San Antonio"@en, "Fort Sam Houston"@en,
+                  "Lackland AFB"@en, "Randolph AFB"@en ;
+    skos:broader ex:TravelLocation ;
+    skos:notation "SAN_ANTONIO_TX" ;
+    skos:definition "Joint Base San Antonio including Fort Sam Houston and Lackland AFB."@en .
+
+ex:ColoradoSprings a skos:Concept ;
+    skos:prefLabel "Colorado Springs"@en ;
+    skos:altLabel "Fort Carson"@en, "Peterson SFB"@en, "Schriever SFB"@en,
+                  "NORAD"@en, "Cheyenne Mountain"@en, "USAFA"@en ;
+    skos:broader ex:TravelLocation ;
+    skos:notation "COLORADO_SPRINGS_CO" ;
+    skos:definition "Colorado Springs military installations including Fort Carson and Space Force bases."@en .
+
+ex:NorfolkVA a skos:Concept ;
+    skos:prefLabel "Norfolk"@en ;
+    skos:altLabel "Naval Station Norfolk"@en, "NS Norfolk"@en, "Hampton Roads"@en,
+                  "Joint Expeditionary Base Little Creek"@en, "NAS Oceana"@en ;
+    skos:broader ex:TravelLocation ;
+    skos:notation "NORFOLK_VA" ;
+    skos:definition "Norfolk naval complex, largest naval station in the world."@en .
+
+ex:HuntsvilleAL a skos:Concept ;
+    skos:prefLabel "Huntsville"@en ;
+    skos:altLabel "Redstone Arsenal"@en, "AMCOM"@en, "PEO Missiles"@en,
+                  "Missile Defense Agency"@en, "MDA"@en ;
+    skos:broader ex:TravelLocation ;
+    skos:notation "HUNTSVILLE_AL" ;
+    skos:definition "Huntsville/Redstone Arsenal, hub of Army acquisition and missile defense."@en .
+
+ex:TampaFL a skos:Concept ;
+    skos:prefLabel "Tampa"@en ;
+    skos:altLabel "MacDill AFB"@en, "CENTCOM"@en, "SOCOM"@en,
+                  "US Central Command"@en, "Special Operations Command"@en ;
+    skos:broader ex:TravelLocation ;
+    skos:notation "TAMPA_FL" ;
+    skos:definition "Tampa/MacDill AFB, home of CENTCOM and SOCOM."@en .
+
+ex:AugustaGA a skos:Concept ;
+    skos:prefLabel "Augusta"@en ;
+    skos:altLabel "Fort Eisenhower"@en, "Fort Gordon"@en, "Cyber Center of Excellence"@en,
+                  "CCoE"@en, "NSA Georgia"@en ;
+    skos:broader ex:TravelLocation ;
+    skos:notation "AUGUSTA_GA" ;
+    skos:definition "Fort Eisenhower (formerly Fort Gordon), home of the Army Cyber Center."@en .
+
+ex:FayettevilleNC a skos:Concept ;
+    skos:prefLabel "Fayetteville"@en ;
+    skos:altLabel "Fort Liberty"@en, "Fort Bragg"@en, "USASOC"@en,
+                  "XVIII Airborne Corps"@en ;
+    skos:broader ex:TravelLocation ;
+    skos:notation "FAYETTEVILLE_NC" ;
+    skos:related ex:FortLiberty ;
+    skos:definition "Fayetteville/Fort Liberty, home of Airborne and Special Operations."@en .
+
+ex:KilleenTX a skos:Concept ;
+    skos:prefLabel "Killeen"@en ;
+    skos:altLabel "Fort Cavazos"@en, "Fort Hood"@en, "III Corps"@en ;
+    skos:broader ex:TravelLocation ;
+    skos:notation "KILLEEN_TX" ;
+    skos:related ex:FortCavazos ;
+    skos:definition "Killeen/Fort Cavazos, one of the largest active-duty installations."@en .
+
+ex:ClarksvilleTN a skos:Concept ;
+    skos:prefLabel "Clarksville"@en ;
+    skos:altLabel "Fort Campbell"@en, "101st Airborne"@en, "Screaming Eagles"@en ;
+    skos:broader ex:TravelLocation ;
+    skos:notation "CLARKSVILLE_TN" ;
+    skos:related ex:FortCampbell ;
+    skos:definition "Clarksville/Fort Campbell, home of the 101st Airborne Division."@en .
+
+ex:OlympiaWA a skos:Concept ;
+    skos:prefLabel "Olympia"@en ;
+    skos:altLabel "JBLM"@en, "Joint Base Lewis-McChord"@en, "Fort Lewis"@en,
+                  "McChord AFB"@en ;
+    skos:broader ex:TravelLocation ;
+    skos:notation "OLYMPIA_WA" ;
+    skos:related ex:JBLM ;
+    skos:definition "Olympia/JBLM area, major Pacific Northwest military installation."@en .
+
+# ── Travel Allowances ──────────────────────────────────────────────────────
+ex:PerDiem a skos:Concept ;
+    skos:prefLabel "Per Diem"@en ;
+    skos:altLabel "Daily Allowance"@en, "Per Diem Rate"@en, "Travel Per Diem"@en,
+                  "TDY Per Diem"@en, "Per Diem Allowance"@en ;
+    skos:broader ex:TravelAllowance ;
+    skos:definition "Daily allowance for lodging, meals, and incidental expenses during official travel."@en ;
+    skos:related ex:JTRChapter3, ex:MIE, ex:Lodging .
+
+ex:MIE a skos:Concept ;
+    skos:prefLabel "Meals and Incidental Expenses"@en ;
+    skos:altLabel "M&IE"@en, "MIE"@en, "Meals and IE"@en, "Meal Rate"@en,
+                  "Meal Allowance"@en, "Incidental Expenses"@en, "IE"@en ;
+    skos:broader ex:TravelAllowance ;
+    skos:definition "The meals and incidental expenses portion of per diem."@en ;
+    skos:related ex:JTRChapter3 .
+
+ex:Lodging a skos:Concept ;
+    skos:prefLabel "Lodging"@en ;
+    skos:altLabel "Hotel"@en, "Lodging Rate"@en, "Lodging Allowance"@en,
+                  "Hotel Rate"@en, "Quarters"@en, "Billeting"@en ;
+    skos:broader ex:TravelAllowance ;
+    skos:definition "The lodging portion of per diem."@en ;
+    skos:related ex:JTRChapter3 .
+
+ex:Mileage a skos:Concept ;
+    skos:prefLabel "Mileage Reimbursement"@en ;
+    skos:altLabel "Mileage"@en, "Mileage Rate"@en, "POV Mileage"@en,
+                  "Per Mile Rate"@en, "Gas Reimbursement"@en ;
+    skos:broader ex:TravelAllowance ;
+    skos:notation "0.67" ;
+    skos:definition "Reimbursement for use of privately owned vehicle at per-mile rate."@en ;
+    skos:related ex:POV, ex:JTRChapter2 .
+
+ex:DLA a skos:Concept ;
+    skos:prefLabel "Dislocation Allowance"@en ;
+    skos:altLabel "DLA"@en, "Moving Allowance"@en, "Relocation Allowance"@en ;
+    skos:broader ex:TravelAllowance ;
+    skos:definition "One-time payment to offset costs of a PCS move."@en ;
+    skos:related ex:PCS, ex:JTRChapter5 .
+
+ex:TravelAdvance a skos:Concept ;
+    skos:prefLabel "Travel Advance"@en ;
+    skos:altLabel "Advance Pay"@en, "TDY Advance"@en, "Travel Pay Advance"@en ;
+    skos:broader ex:TravelAllowance ;
+    skos:definition "Advance payment of estimated travel expenses before TDY travel."@en ;
+    skos:related ex:JTRChapter2 .
+
+# ── Transport Modes ────────────────────────────────────────────────────────
+ex:POV a skos:Concept ;
+    skos:prefLabel "Privately Owned Vehicle"@en ;
+    skos:altLabel "POV"@en, "Personal Vehicle"@en, "Own Car"@en, "Drive"@en, "Driving"@en ;
+    skos:broader ex:TransportMode ;
+    skos:definition "Use of personal vehicle for official travel."@en ;
+    skos:related ex:Mileage, ex:JTRChapter2 .
+
+ex:GOV a skos:Concept ;
+    skos:prefLabel "Government Vehicle"@en ;
+    skos:altLabel "GOV"@en, "Government Car"@en, "GSA Vehicle"@en, "Fleet Vehicle"@en ;
+    skos:broader ex:TransportMode ;
+    skos:definition "Use of government-owned vehicle for official travel."@en .
+
+ex:CommercialAir a skos:Concept ;
+    skos:prefLabel "Commercial Air"@en ;
+    skos:altLabel "Flight"@en, "Fly"@en, "Flying"@en, "Airplane"@en, "Airline"@en,
+                  "Commercial Flight"@en, "Air Travel"@en, "City Pair"@en, "CTO"@en ;
+    skos:broader ex:TransportMode ;
+    skos:definition "Commercial airline travel, typically via City Pair fares or CTO."@en ;
+    skos:related ex:JTRChapter2 .
+
+ex:RentalCar a skos:Concept ;
+    skos:prefLabel "Rental Car"@en ;
+    skos:altLabel "Rental Vehicle"@en, "Car Rental"@en, "Rent a Car"@en,
+                  "DTMO Rental"@en ;
+    skos:broader ex:TransportMode ;
+    skos:definition "Rental vehicle for use at TDY location."@en ;
+    skos:related ex:JTRChapter2 .
+
+ex:MilitaryAir a skos:Concept ;
+    skos:prefLabel "Military Air"@en ;
+    skos:altLabel "AMC"@en, "Military Airlift"@en, "Space-A"@en, "Space Available"@en,
+                  "Air Mobility Command"@en, "Rotator"@en ;
+    skos:broader ex:TransportMode ;
+    skos:definition "Military airlift or space-available flights."@en .
+
+# ── Travel Regulations ─────────────────────────────────────────────────────
+ex:JTRChapter2 a skos:Concept ;
+    skos:prefLabel "JTR Chapter 2 - TDY Travel"@en ;
+    skos:altLabel "JTR Ch 2"@en, "JTR Chapter 2"@en, "Joint Travel Regulations Chapter 2"@en ;
+    skos:broader ex:TravelRegulation ;
+    skos:definition "JTR Chapter 2 covers TDY travel allowances, transportation, and reimbursement."@en .
+
+ex:JTRChapter3 a skos:Concept ;
+    skos:prefLabel "JTR Chapter 3 - Per Diem"@en ;
+    skos:altLabel "JTR Ch 3"@en, "JTR Chapter 3"@en, "Joint Travel Regulations Chapter 3"@en ;
+    skos:broader ex:TravelRegulation ;
+    skos:definition "JTR Chapter 3 covers per diem rates, lodging, and M&IE for TDY travel."@en .
+
+ex:JTRChapter4 a skos:Concept ;
+    skos:prefLabel "JTR Chapter 4 - Government Quarters"@en ;
+    skos:altLabel "JTR Ch 4"@en, "JTR Chapter 4"@en ;
+    skos:broader ex:TravelRegulation ;
+    skos:definition "JTR Chapter 4 covers government quarters and lodging at military installations."@en .
+
+ex:JTRChapter5 a skos:Concept ;
+    skos:prefLabel "JTR Chapter 5 - PCS Travel"@en ;
+    skos:altLabel "JTR Ch 5"@en, "JTR Chapter 5"@en, "Joint Travel Regulations Chapter 5"@en ;
+    skos:broader ex:TravelRegulation ;
+    skos:definition "JTR Chapter 5 covers PCS travel, transportation, and relocation allowances."@en .
+
+ex:DoD4500_9R a skos:Concept ;
+    skos:prefLabel "DoD 4500.9-R Defense Transportation Regulation"@en ;
+    skos:altLabel "DTR"@en, "DoD 4500.9-R"@en, "Defense Transportation Regulation"@en ;
+    skos:broader ex:TravelRegulation ;
+    skos:definition "Defense Transportation Regulation governing movement of personnel and cargo."@en .
+
+ex:DTMO a skos:Concept ;
+    skos:prefLabel "Defense Travel Management Office"@en ;
+    skos:altLabel "DTMO"@en, "DTS"@en, "Defense Travel System"@en ;
+    skos:broader ex:TravelRegulation ;
+    skos:definition "DTMO manages the Defense Travel System and sets travel policy guidance."@en .

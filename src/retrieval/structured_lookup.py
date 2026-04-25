@@ -152,3 +152,58 @@ def lookup_all_bah_for_grade(
         return [dict(row) for row in cursor.fetchall()]
     finally:
         conn.close()
+
+
+def lookup_perdiem(
+    city: str,
+    state: Optional[str] = None,
+    db_path: Optional[Path] = None,
+) -> Optional[dict]:
+    """Look up per diem rate for a city/state.
+
+    Tries exact city match first, falls back to Standard CONUS rate.
+
+    Args:
+        city: City name (e.g., 'San Diego', 'Fayetteville').
+        state: Optional 2-letter state code (e.g., 'CA', 'NC').
+        db_path: Optional database path override.
+
+    Returns:
+        Dict with lodging_rate, mie_rate, etc., or None if not found.
+    """
+    conn = _get_connection(db_path)
+    try:
+        if state:
+            cursor = conn.execute(
+                """SELECT city, state, county, lodging_rate, mie_rate, fiscal_year, notes
+                   FROM perdiem_rates
+                   WHERE LOWER(city) = LOWER(?) AND LOWER(state) = LOWER(?)""",
+                (city, state),
+            )
+        else:
+            cursor = conn.execute(
+                """SELECT city, state, county, lodging_rate, mie_rate, fiscal_year, notes
+                   FROM perdiem_rates
+                   WHERE LOWER(city) = LOWER(?) AND city != 'Standard CONUS'""",
+                (city,),
+            )
+        row = cursor.fetchone()
+        if row:
+            d = dict(row)
+            d["total_perdiem"] = d["lodging_rate"] + d["mie_rate"]
+            return d
+
+        # Fall back to standard CONUS rate
+        cursor = conn.execute(
+            """SELECT city, state, county, lodging_rate, mie_rate, fiscal_year, notes
+               FROM perdiem_rates
+               WHERE city = 'Standard CONUS'"""
+        )
+        row = cursor.fetchone()
+        if row:
+            d = dict(row)
+            d["total_perdiem"] = d["lodging_rate"] + d["mie_rate"]
+            return d
+        return None
+    finally:
+        conn.close()

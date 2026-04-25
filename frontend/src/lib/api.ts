@@ -61,6 +61,12 @@ export async function fetchExamples(): Promise<string[]> {
   return res.json();
 }
 
+export async function fetchTDYExamples(): Promise<string[]> {
+  const res = await fetch(`${API_BASE}/api/tdy/examples`);
+  if (!res.ok) throw new Error(`TDY examples fetch failed: ${res.status}`);
+  return res.json();
+}
+
 export async function submitQuery(query: string): Promise<QueryResponse> {
   const res = await fetch(`${API_BASE}/api/query`, {
     method: "POST",
@@ -70,6 +76,19 @@ export async function submitQuery(query: string): Promise<QueryResponse> {
   if (!res.ok) {
     const err = await res.text();
     throw new Error(`Query failed: ${err}`);
+  }
+  return res.json();
+}
+
+export async function submitTDYQuery(query: string): Promise<QueryResponse> {
+  const res = await fetch(`${API_BASE}/api/tdy/query`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`TDY query failed: ${err}`);
   }
   return res.json();
 }

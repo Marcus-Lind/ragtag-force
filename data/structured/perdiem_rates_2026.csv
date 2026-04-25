@@ -1,0 +1,27 @@
+city,state,county,lodging_rate,mie_rate,fiscal_year,notes
+Washington,DC,,218,79,2026,Pentagon / NCR - Non-Standard Area
+San Diego,CA,San Diego,194,74,2026,Naval Base San Diego / Camp Pendleton
+San Antonio,TX,Bexar,117,64,2026,JBSA - Ft Sam Houston / Lackland / Randolph
+Colorado Springs,CO,El Paso,139,69,2026,Fort Carson / Peterson SFB / USAFA
+Norfolk,VA,,142,69,2026,Naval Station Norfolk / Hampton Roads
+Huntsville,AL,Madison,144,69,2026,Redstone Arsenal / AMCOM / MDA
+Tampa,FL,Hillsborough,143,69,2026,MacDill AFB / CENTCOM / SOCOM
+Augusta,GA,Richmond,103,64,2026,Fort Eisenhower (formerly Fort Gordon)
+Fayetteville,NC,Cumberland,110,64,2026,Fort Liberty (formerly Fort Bragg)
+Killeen,TX,Bell,110,64,2026,Fort Cavazos (formerly Fort Hood)
+Clarksville,TN,Montgomery,110,64,2026,Fort Campbell / 101st Airborne
+Olympia,WA,Thurston,122,64,2026,JBLM / Joint Base Lewis-McChord
+Honolulu,HI,Honolulu,253,79,2026,Schofield Barracks / Pearl Harbor
+Anchorage,AK,,162,74,2026,JBER / Joint Base Elmendorf-Richardson
+El Paso,TX,El Paso,110,64,2026,Fort Bliss
+Lawton,OK,Comanche,98,59,2026,Fort Sill
+Columbus,GA,Muscogee,120,64,2026,Fort Moore (formerly Fort Benning)
+Watertown,NY,Jefferson,110,64,2026,Fort Drum / 10th Mountain Division
+Monterey,CA,Monterey,175,74,2026,Naval Postgraduate School / DLI
+Leavenworth,KS,Leavenworth,110,64,2026,Fort Leavenworth / CGSC
+Jacksonville,NC,Onslow,98,59,2026,Camp Lejeune / Marine Corps Base
+Pensacola,FL,Escambia,131,69,2026,NAS Pensacola / Naval Aviation
+Dahlgren,VA,King George,142,69,2026,Naval Support Facility Dahlgren
+Quantico,VA,Prince William,183,74,2026,MCB Quantico / FBI Academy
+Sierra Vista,AZ,Cochise,98,59,2026,Fort Huachuca / Army Intelligence Center
+Standard CONUS,,,110,68,2026,Default rate for all unlisted CONUS locations

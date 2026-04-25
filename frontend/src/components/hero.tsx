@@ -1,6 +1,17 @@
 import { Badge } from "@/components/ui/badge";
 
-export function Hero() {
+interface HeroProps {
+  domain?: "benefits" | "tdy";
+}
+
+const DESCRIPTIONS: Record<string, string> = {
+  benefits:
+    "Compare basic RAG against Ontology Enhanced RAG for military benefits and entitlements. See how SKOS knowledge graphs dramatically improve retrieval accuracy.",
+  tdy:
+    "Compare basic RAG against Ontology Enhanced RAG for TDY travel planning. See how ontology-driven per diem lookups and JTR knowledge deliver precise travel guidance.",
+};
+
+export function Hero({ domain = "benefits" }: HeroProps) {
   return (
     <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-[#1B2A4A] via-[#2D4A7A] to-[#3B6B9A] px-8 py-10 mb-6">
       <div className="absolute -top-24 -right-16 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(197,164,78,0.15)_0%,transparent_70%)]" />
@@ -15,9 +26,7 @@ export function Hero() {
           RAG-Tag Force
         </h1>
         <p className="mt-2 max-w-xl text-sm text-white/75 leading-relaxed font-light">
-          Compare basic RAG against Ontology Enhanced RAG for military benefits
-          and entitlements. See how SKOS knowledge graphs dramatically improve
-          retrieval accuracy.
+          {DESCRIPTIONS[domain]}
         </p>
       </div>
     </div>
