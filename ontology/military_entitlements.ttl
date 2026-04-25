@@ -225,7 +225,7 @@ ex:BasePay a skos:Concept ;
 
 ex:LeaveAccrual a skos:Concept ;
     skos:prefLabel "Leave Accrual"@en ;
-    skos:altLabel "Annual Leave"@en, "Leave Days"@en, "Military Leave"@en, "PTO"@en, "Vacation"@en ;
+    skos:altLabel "Annual Leave"@en, "Leave Days"@en, "Military Leave"@en, "PTO"@en, "Vacation"@en, "Leave"@en, "Accrued Leave"@en, "Leave Entitlement"@en ;
     skos:broader ex:Allowance ;
     skos:related ex:AR_600_8_10 ;
     skos:definition "Service members accrue 2.5 days of leave per month (30 days per year). Governed by AR 600-8-10."@en .
