@@ -12,7 +12,7 @@ from typing import Optional
 from src.ontology.tdy_expander import TDYQueryExpansion, expand_tdy_query
 from src.ingest.embeddings import embed_query
 from src.ingest.vector_store import get_chroma_client
-from src.retrieval.structured_lookup import lookup_perdiem
+from src.retrieval.gsa_client import lookup_perdiem_gsa
 from src.config import DEFAULT_TOP_K
 
 
@@ -40,7 +40,7 @@ class TDYRetrievalResult:
             parts.append(f"Document {i} {header}:\n{doc['text']}")
 
         if self.structured_data:
-            parts.append("\n--- Structured Data (from GSA per diem rate tables) ---")
+            parts.append("\n--- Structured Data (live from GSA Per Diem API) ---")
             for key, value in self.structured_data.items():
                 if value is not None:
                     parts.append(f"{key}: {value}")
@@ -81,13 +81,13 @@ def _tdy_vector_search(query_text: str, top_k: int = DEFAULT_TOP_K) -> list[dict
 
 
 def _gather_tdy_structured_data(expansion: Optional[TDYQueryExpansion]) -> dict:
-    """Query per diem rates based on extracted travel locations.
+    """Query live GSA Per Diem API based on extracted travel locations.
 
     Args:
         expansion: TDY query expansion with extracted entities.
 
     Returns:
-        Dictionary of structured per diem data.
+        Dictionary of structured per diem data from the live GSA API.
     """
     if not expansion or not expansion.entities:
         return {}
@@ -95,7 +95,7 @@ def _gather_tdy_structured_data(expansion: Optional[TDYQueryExpansion]) -> dict:
     data: dict = {}
     entities = expansion.entities
 
-    # Per diem lookup for travel locations
+    # Per diem lookup via live GSA API
     if entities.locations and expansion.location_codes:
         code = expansion.location_codes[0]
         # Parse city/state from location code (e.g., "SAN_DIEGO_CA" or "DC")
@@ -107,14 +107,15 @@ def _gather_tdy_structured_data(expansion: Optional[TDYQueryExpansion]) -> dict:
             city = code
             state = None
 
-        perdiem = lookup_perdiem(city, state)
+        perdiem = lookup_perdiem_gsa(city, state)
         if perdiem:
             data["Per Diem Location"] = f"{perdiem['city']}, {perdiem['state'] or ''}"
-            data["Lodging Rate (max)"] = f"${perdiem['lodging_rate']}/night"
+            data["Lodging Rate (current month)"] = f"${perdiem['lodging_rate']}/night"
             data["M&IE Rate"] = f"${perdiem['mie_rate']}/day"
             data["Total Per Diem"] = f"${perdiem['total_perdiem']}/day"
-            if perdiem.get("notes"):
-                data["Location Notes"] = perdiem["notes"]
+            data["Data Source"] = perdiem.get("source", "GSA Per Diem API")
+            if perdiem.get("seasonal_note"):
+                data["Seasonal Info"] = perdiem["seasonal_note"]
 
     # Mileage rate if POV mentioned
     for uri in entities.transport_modes:

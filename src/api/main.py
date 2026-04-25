@@ -328,8 +328,8 @@ def _tdy_answer_to_result(tdy_answer: Any, original_query: str) -> AnswerResult:
 
     if is_enhanced and structured_data:
         trace.append(PipelineStep(
-            label="Per Diem Lookup",
-            detail=f"Found {len(structured_data)} fields from GSA rate tables",
+            label="GSA Per Diem API",
+            detail=f"Live query returned {len(structured_data)} fields from api.gsa.gov",
             highlight=True,
         ))
     elif not is_enhanced:
