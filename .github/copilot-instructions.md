@@ -1,7 +1,7 @@
 # RAG-Tag Force — Copilot Instructions
 
 ## What This Project Is
-An ontology-enhanced RAG system for military benefits and entitlements navigation.
+An ontology enhanced RAG system for military benefits and entitlements navigation.
 Core thesis: a SKOS ontology layer improves RAG retrieval quality over naive vector
 search by expanding queries with synonyms, hierarchy, and concept-to-document mappings.
 The Streamlit UI must always show BOTH answers side by side so the delta is visible.
@@ -23,7 +23,7 @@ Query -> Entity Extraction -> Ontology Expansion -> [Vector Search + Structured 
 ## Non-Negotiable Design Rules
 1. NEVER embed rate tables (BAH, pay charts, per diem). Query SQLite directly.
 2. ALWAYS add source citations to LLM answers (document name + section number).
-3. Streamlit UI MUST show two columns: naive RAG answer vs ontology-enhanced answer.
+3. Streamlit UI MUST show two columns: basic RAG answer vs ontology enhanced answer.
    The delta between these two columns is the entire demo. Never remove this.
 4. All file paths use pathlib.Path. No hardcoded strings.
 5. All functions have docstrings. All modules have type hints.

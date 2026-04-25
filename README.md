@@ -1,9 +1,9 @@
 # RAG-Tag Force 🪖
 
-> Ontology-enhanced RAG for military benefits and entitlements navigation | SCSP Hackathon 2026 | GenAI.mil Track
+> Ontology Enhanced RAG for military benefits and entitlements navigation | SCSP Hackathon 2026 | GenAI.mil Track
 
 ## The Thesis
-Naive RAG fails military personnel because it doesn't understand that "SPC", "Specialist", "Corporal", and "E-4" are the same thing. Our SKOS ontology layer expands every query with synonyms, rank hierarchies, and installation-to-locality mappings before hitting the vector store — producing dramatically more accurate answers.
+Basic RAG fails military personnel because it doesn't understand that "SPC", "Specialist", "Corporal", and "E-4" are the same thing. Our SKOS ontology layer expands every query with synonyms, rank hierarchies, and installation-to-locality mappings before hitting the vector store — producing dramatically more accurate answers.
 
 ## Architecture
 ```
@@ -69,7 +69,7 @@ python scripts/setup.py
 ### The Demo (Two Columns)
 The Streamlit UI shows **two answers side by side** for every question:
 
-| **Naive RAG** | **Ontology-Enhanced RAG** |
+| **Basic RAG** | **Ontology Enhanced RAG** |
 |---|---|
 | Raw query → vector search → LLM | Query → SKOS expansion → enhanced search + structured data → LLM |
 | Misses synonyms and alternate terms | Expands "E-4" to include "SPC", "Specialist", "Corporal" |

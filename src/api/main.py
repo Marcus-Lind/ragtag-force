@@ -23,7 +23,7 @@ from src.llm.generator import generate_naive_answer, generate_enhanced_answer
 
 app = FastAPI(
     title="RAG-Tag Force API",
-    description="Ontology-enhanced RAG for military benefits and entitlements",
+    description="Ontology Enhanced RAG for military benefits and entitlements",
     version="0.2.0",
 )
 
@@ -171,7 +171,7 @@ def _rag_answer_to_result(rag_answer: Any, original_query: str) -> AnswerResult:
     elif not is_enhanced:
         trace.append(PipelineStep(
             label="Structured Lookup",
-            detail="Skipped — naive pipeline has no entity awareness",
+            detail="Skipped — basic pipeline has no entity awareness",
         ))
 
     trace.append(PipelineStep(

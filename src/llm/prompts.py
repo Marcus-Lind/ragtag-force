@@ -39,7 +39,7 @@ Provide a clear, cited answer based on the context above. Include any exact rate
 
 
 def build_naive_prompt(query: str, context: str) -> tuple[str, str]:
-    """Build the naive RAG prompt (no ontology expansion info).
+    """Build the basic RAG prompt (no ontology expansion info).
 
     Args:
         query: User's original query.
@@ -59,7 +59,7 @@ def build_enhanced_prompt(
     related_regs: list[str] | None = None,
     structured_summary: str = "",
 ) -> tuple[str, str]:
-    """Build the ontology-enhanced RAG prompt.
+    """Build the Ontology Enhanced RAG prompt.
 
     Includes expansion metadata so the LLM knows what synonyms and
     regulations were used to retrieve the context.

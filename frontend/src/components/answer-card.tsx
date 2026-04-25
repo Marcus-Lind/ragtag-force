@@ -55,7 +55,7 @@ export function AnswerCard({ variant, result, loading }: AnswerCardProps) {
           </div>
           <div>
             <h3 className="text-sm font-semibold text-foreground">
-              {isEnhanced ? "Ontology-Enhanced RAG" : "Naive RAG"}
+              {isEnhanced ? "Ontology Enhanced RAG" : "Basic RAG"}
             </h3>
             <p className="text-xs text-muted-foreground">
               {isEnhanced

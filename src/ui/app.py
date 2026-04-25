@@ -1,7 +1,7 @@
 """RAG-Tag Force — Streamlit UI.
 
-Enterprise-grade two-column comparison interface showing naive RAG vs
-ontology-enhanced RAG side by side for the SCSP Hackathon 2026 demo.
+Enterprise-grade two-column comparison interface showing basic RAG vs
+ontology enhanced RAG side by side for the SCSP Hackathon 2026 demo.
 """
 
 import sys
@@ -311,7 +311,7 @@ def _render_sidebar(status: dict) -> None:
                 &#x1FA96; RAG-Tag Force
             </div>
             <div style="font-size: 0.78rem; color: #94A3B8; margin-top: 0.2rem;">
-                Ontology-Enhanced RAG for Military Benefits
+                Ontology Enhanced RAG for Military Benefits
             </div>
         </div>
         """,
@@ -371,7 +371,7 @@ def _render_sidebar(status: dict) -> None:
     st.sidebar.markdown(
         """
         <div style="font-size: 0.78rem; color: #CBD5E1; line-height: 1.7;">
-            <strong style="color: white;">The Problem:</strong> Naive RAG fails military
+            <strong style="color: white;">The Problem:</strong> Basic RAG fails military
             personnel because "SPC", "Specialist", and "E-4" are the same rank &mdash; but
             vector search doesn't know that.<br/><br/>
             <strong style="color: white;">Our Solution:</strong> A SKOS ontology layer
@@ -408,7 +408,7 @@ def _render_answer_card(answer: RAGAnswer, variant: str) -> None:
     card_class = "rtf-enhanced" if is_enhanced else "rtf-naive"
     icon_class = "rtf-enhanced-icon" if is_enhanced else "rtf-naive-icon"
     icon = "&#x1F9E0;" if is_enhanced else "&#x1F4C4;"
-    title = "Ontology-Enhanced RAG" if is_enhanced else "Naive RAG"
+    title = "Ontology Enhanced RAG" if is_enhanced else "Basic RAG"
     subtitle = (
         "SKOS Expansion &rarr; Enhanced Search &rarr; Structured Data &rarr; LLM"
         if is_enhanced
@@ -514,12 +514,12 @@ def _run_query(query: str, status: dict) -> None:
     col1, col2 = st.columns(2, gap="large")
 
     with col1:
-        with st.spinner("Running naive RAG pipeline..."):
+        with st.spinner("Running basic RAG pipeline..."):
             naive_result = generate_naive_answer(query, client=llm_client)
             st.session_state.naive_answer = naive_result
 
     with col2:
-        with st.spinner("Running ontology-enhanced RAG pipeline..."):
+        with st.spinner("Running Ontology Enhanced RAG pipeline..."):
             enhanced_result = generate_enhanced_answer(query, client=llm_client)
             st.session_state.enhanced_answer = enhanced_result
 
@@ -554,7 +554,7 @@ def main() -> None:
             <div class="rtf-badge">SCSP Hackathon 2026 &middot; GenAI.mil</div>
             <h1>RAG-Tag Force</h1>
             <p>
-                Compare naive RAG against ontology-enhanced RAG for military benefits
+                Compare basic RAG against Ontology Enhanced RAG for military benefits
                 and entitlements. See how SKOS knowledge graphs dramatically improve
                 retrieval accuracy.
             </p>

@@ -11,7 +11,7 @@ export function Sidebar({ status }: SidebarProps) {
       <div className="px-5 pt-6 pb-4">
         <div className="text-lg font-bold tracking-tight">🪖 RAG-Tag Force</div>
         <div className="mt-1 text-xs text-slate-400">
-          Ontology-Enhanced RAG for Military Benefits
+          Ontology Enhanced RAG for Military Benefits
         </div>
       </div>
 

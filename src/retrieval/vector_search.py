@@ -1,6 +1,6 @@
 """Vector search using ChromaDB.
 
-Provides both naive (raw query) and ontology-enhanced vector search
+Provides both basic (raw query) and ontology enhanced vector search
 over the ingested document collection.
 """
 
@@ -43,7 +43,7 @@ def naive_search(
     top_k: int = DEFAULT_TOP_K,
     collection: Optional[chromadb.Collection] = None,
 ) -> list[dict]:
-    """Perform naive vector search using the raw query.
+    """Perform basic vector search using the raw query.
 
     Args:
         query: User's original query string.
@@ -68,7 +68,7 @@ def enhanced_search(
     top_k: int = DEFAULT_TOP_K,
     collection: Optional[chromadb.Collection] = None,
 ) -> list[dict]:
-    """Perform ontology-enhanced vector search using the expanded query.
+    """Perform Ontology Enhanced vector search using the expanded query.
 
     The expanded query includes synonyms, related terms, and regulation
     references from the ontology, which produces better semantic matches.

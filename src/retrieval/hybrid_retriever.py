@@ -1,6 +1,6 @@
 """Hybrid retriever combining vector search with structured data lookup.
 
-Orchestrates the full retrieval pipeline for both naive and enhanced paths,
+Orchestrates the full retrieval pipeline for both basic and enhanced paths,
 combining document context from ChromaDB with structured data from SQLite.
 """
 
@@ -107,7 +107,7 @@ def _gather_structured_data(expansion: Optional[QueryExpansion]) -> dict:
 
 
 def retrieve_naive(query: str, top_k: int = DEFAULT_TOP_K) -> RetrievalResult:
-    """Perform naive retrieval using raw query only.
+    """Perform basic retrieval using raw query only.
 
     No ontology expansion — just vector search + basic structured lookup.
 
@@ -135,7 +135,7 @@ def retrieve_naive(query: str, top_k: int = DEFAULT_TOP_K) -> RetrievalResult:
 
 
 def retrieve_enhanced(query: str, top_k: int = DEFAULT_TOP_K) -> RetrievalResult:
-    """Perform ontology-enhanced retrieval.
+    """Perform Ontology Enhanced retrieval.
 
     Expands query with SKOS ontology, then performs enhanced vector search
     plus structured data lookup using extracted entities.

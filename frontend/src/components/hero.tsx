@@ -15,7 +15,7 @@ export function Hero() {
           RAG-Tag Force
         </h1>
         <p className="mt-2 max-w-xl text-sm text-white/75 leading-relaxed font-light">
-          Compare naive RAG against ontology-enhanced RAG for military benefits
+          Compare basic RAG against Ontology Enhanced RAG for military benefits
           and entitlements. See how SKOS knowledge graphs dramatically improve
           retrieval accuracy.
         </p>

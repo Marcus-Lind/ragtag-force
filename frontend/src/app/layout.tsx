@@ -9,7 +9,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "RAG-Tag Force | Military Benefits Navigator",
-  description: "Ontology-enhanced RAG for military benefits and entitlements — SCSP Hackathon 2026",
+  description: "Ontology Enhanced RAG for military benefits and entitlements — SCSP Hackathon 2026",
 };
 
 export default function RootLayout({

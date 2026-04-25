@@ -1,7 +1,7 @@
 """Answer generation orchestrator.
 
 Ties together retrieval and LLM generation for both naive and
-ontology-enhanced RAG pipelines.
+ontology enhanced RAG pipelines.
 """
 
 from dataclasses import dataclass, field
@@ -57,7 +57,7 @@ def generate_naive_answer(
     top_k: int = DEFAULT_TOP_K,
     client: Optional[LLMClient] = None,
 ) -> RAGAnswer:
-    """Generate an answer using naive RAG (no ontology enhancement).
+    """Generate an answer using basic RAG (no ontology enhancement).
 
     Args:
         query: User's original query.
@@ -103,7 +103,7 @@ def generate_enhanced_answer(
     top_k: int = DEFAULT_TOP_K,
     client: Optional[LLMClient] = None,
 ) -> RAGAnswer:
-    """Generate an answer using ontology-enhanced RAG.
+    """Generate an answer using Ontology Enhanced RAG.
 
     Args:
         query: User's original query.
