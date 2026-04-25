@@ -69,12 +69,18 @@ export function AnswerCard({ variant, result, loading }: AnswerCardProps) {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Pipeline Trace — always visible */}
-        <PipelineTrace result={result} isEnhanced={isEnhanced} />
+        {/* Pipeline Trace — collapsible, collapsed by default */}
+        {result.pipeline_trace && result.pipeline_trace.length > 0 && (
+          <CollapsibleSection title="Pipeline Trace">
+            <PipelineTrace result={result} isEnhanced={isEnhanced} />
+          </CollapsibleSection>
+        )}
 
-        {/* Ontology Resolution Chain — enhanced only */}
+        {/* Ontology Resolution Chain — enhanced only, collapsible */}
         {isEnhanced && result.resolution_chains && result.resolution_chains.length > 0 && (
-          <OntologyResolutionChain chains={result.resolution_chains} />
+          <CollapsibleSection title="🔗 Ontology Resolution Chain">
+            <OntologyResolutionChain chains={result.resolution_chains} />
+          </CollapsibleSection>
         )}
 
         {/* Answer */}
@@ -266,10 +272,7 @@ function PipelineTrace({ result, isEnhanced }: { result: AnswerResult; isEnhance
   if (!steps || steps.length === 0) return null;
 
   return (
-    <div className={`rounded-lg border p-3 ${isEnhanced ? "bg-amber-50/30 border-amber-200" : "bg-gray-50 border-gray-200"}`}>
-      <div className="text-[0.68rem] font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">
-        Pipeline Trace
-      </div>
+    <div className={`${isEnhanced ? "bg-amber-50/30" : "bg-gray-50"} rounded p-1`}>
       <div className="space-y-0">
         {steps.map((step, i) => (
           <div key={i} className="flex items-start gap-2.5">
@@ -304,34 +307,28 @@ function OntologyResolutionChain({ chains }: { chains: ResolutionChainType[] }) 
   if (!chains || chains.length === 0) return null;
 
   return (
-    <div className="rounded-lg border border-amber-200 bg-gradient-to-br from-amber-50/50 to-orange-50/30 p-3">
-      <div className="text-[0.68rem] font-semibold uppercase tracking-wider text-amber-800 mb-3">
-        🔗 Ontology Resolution Chain
-      </div>
-      <div className="space-y-3">
-        {chains.map((chain, ci) => (
-          <div key={ci} className="space-y-1">
-            {/* Input term pill */}
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="inline-flex items-center rounded-md bg-white border border-amber-300 px-2 py-1 text-xs font-semibold text-amber-900 shadow-sm">
-                &ldquo;{chain.input_term}&rdquo;
-              </span>
-              {chain.steps.map((step, si) => (
-                <span key={si} className="contents">
-                  <span className="text-amber-400 text-xs">→</span>
-                  <span className="inline-flex flex-col rounded-md bg-white/80 border border-amber-200/60 px-2 py-1 max-w-[220px]">
-                    <span className="text-[0.6rem] text-amber-600 font-medium leading-tight">{step.label}</span>
-                    <span className="text-[0.68rem] text-foreground font-semibold leading-tight truncate" title={step.value}>
-                      {step.value}
-                    </span>
+    <div className="space-y-3">
+      {chains.map((chain, ci) => (
+        <div key={ci} className="space-y-1">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="inline-flex items-center rounded-md bg-white border border-amber-300 px-2 py-1 text-xs font-semibold text-amber-900 shadow-sm">
+              &ldquo;{chain.input_term}&rdquo;
+            </span>
+            {chain.steps.map((step, si) => (
+              <span key={si} className="contents">
+                <span className="text-amber-400 text-xs">→</span>
+                <span className="inline-flex flex-col rounded-md bg-white/80 border border-amber-200/60 px-2 py-1 max-w-[220px]">
+                  <span className="text-[0.6rem] text-amber-600 font-medium leading-tight">{step.label}</span>
+                  <span className="text-[0.68rem] text-foreground font-semibold leading-tight truncate" title={step.value}>
+                    {step.value}
                   </span>
                 </span>
-              ))}
-            </div>
+              </span>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="mt-2.5 text-[0.6rem] text-amber-700/60 italic">
+        </div>
+      ))}
+      <div className="text-[0.6rem] text-amber-700/60 italic">
         Each term is resolved through the SKOS knowledge graph to enable precise structured data queries.
       </div>
     </div>
