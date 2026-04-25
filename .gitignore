@@ -11,3 +11,8 @@ dist/
 build/
 .venv/
 venv/
+
+# Frontend (Next.js)
+node_modules/
+frontend/.next/
+frontend/out/
