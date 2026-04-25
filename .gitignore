@@ -8,6 +8,7 @@ data/chroma/
 data/structured/*.db
 *.egg-info/
 dist/
+.playwright-mcp/
 build/
 .venv/
 venv/
