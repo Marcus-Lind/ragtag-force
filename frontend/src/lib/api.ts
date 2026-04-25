@@ -13,6 +13,12 @@ export interface ExpansionDetail {
   dependency_statuses: string[];
 }
 
+export interface PipelineStep {
+  label: string;
+  detail: string;
+  highlight: boolean;
+}
+
 export interface AnswerResult {
   answer: string;
   error: string | null;
@@ -21,6 +27,9 @@ export interface AnswerResult {
   sources: string[];
   structured_data: StructuredDataItem[];
   expansion: ExpansionDetail | null;
+  search_query: string;
+  avg_distance: number | null;
+  pipeline_trace: PipelineStep[];
 }
 
 export interface QueryResponse {

@@ -63,6 +63,13 @@ class ExpansionDetail(BaseModel):
     dependency_statuses: list[str] = []
 
 
+class PipelineStep(BaseModel):
+    """A single step in the pipeline trace."""
+    label: str
+    detail: str
+    highlight: bool = False
+
+
 class AnswerResult(BaseModel):
     """A single RAG pipeline answer."""
     answer: str
@@ -72,6 +79,9 @@ class AnswerResult(BaseModel):
     sources: list[str] = []
     structured_data: list[StructuredDataItem] = []
     expansion: Optional[ExpansionDetail] = None
+    search_query: str = ""
+    avg_distance: Optional[float] = None
+    pipeline_trace: list[PipelineStep] = []
 
 
 class QueryResponse(BaseModel):
@@ -95,7 +105,7 @@ class StatusResponse(BaseModel):
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
 
-def _rag_answer_to_result(rag_answer: Any) -> AnswerResult:
+def _rag_answer_to_result(rag_answer: Any, original_query: str) -> AnswerResult:
     """Convert a RAGAnswer dataclass to an API response model."""
     structured_data = []
     if rag_answer.retrieval.structured_data:
@@ -103,6 +113,7 @@ def _rag_answer_to_result(rag_answer: Any) -> AnswerResult:
             structured_data.append(StructuredDataItem(key=k, value=str(v)))
 
     expansion = None
+    expanded_query = ""
     if rag_answer.retrieval.expansion:
         exp = rag_answer.retrieval.expansion
         expansion = ExpansionDetail(
@@ -112,6 +123,62 @@ def _rag_answer_to_result(rag_answer: Any) -> AnswerResult:
             grade_notations=exp.grade_notations or [],
             dependency_statuses=exp.dependency_statuses or [],
         )
+        expanded_query = exp.expanded_query
+
+    # Compute average distance from retrieval results
+    distances = [
+        d.get("distance")
+        for d in rag_answer.retrieval.documents
+        if d.get("distance") is not None
+    ]
+    avg_dist = sum(distances) / len(distances) if distances else None
+
+    # Build pipeline trace
+    trace: list[PipelineStep] = []
+    is_enhanced = rag_answer.is_enhanced
+
+    trace.append(PipelineStep(
+        label="Input Query",
+        detail=original_query,
+    ))
+
+    if is_enhanced:
+        trace.append(PipelineStep(
+            label="Entity Extraction",
+            detail=f"Found {len(rag_answer.retrieval.expansion.entities.ranks) if rag_answer.retrieval.expansion and rag_answer.retrieval.expansion.entities else 0} ranks, "
+                   f"{len(rag_answer.retrieval.expansion.entities.installations) if rag_answer.retrieval.expansion and rag_answer.retrieval.expansion.entities else 0} installations, "
+                   f"{len(rag_answer.retrieval.expansion.entities.allowances) if rag_answer.retrieval.expansion and rag_answer.retrieval.expansion.entities else 0} allowances",
+            highlight=True,
+        ))
+        trace.append(PipelineStep(
+            label="SKOS Expansion",
+            detail=f"Query expanded with {len(rag_answer.retrieval.expansion.expanded_terms) if rag_answer.retrieval.expansion else 0} terms",
+            highlight=True,
+        ))
+
+    search_q = expanded_query if is_enhanced else original_query
+    trace.append(PipelineStep(
+        label="Vector Search",
+        detail=f"Searched {len(rag_answer.retrieval.documents)} docs (avg distance: {avg_dist:.3f})" if avg_dist else f"Retrieved {len(rag_answer.retrieval.documents)} documents",
+    ))
+
+    if is_enhanced and structured_data:
+        trace.append(PipelineStep(
+            label="Structured Lookup",
+            detail=f"Found {len(structured_data)} fields from SQLite rate tables",
+            highlight=True,
+        ))
+    elif not is_enhanced:
+        trace.append(PipelineStep(
+            label="Structured Lookup",
+            detail="Skipped — naive pipeline has no entity awareness",
+        ))
+
+    trace.append(PipelineStep(
+        label="LLM Generation",
+        detail=f"Claude Haiku with {len(rag_answer.retrieval.documents)} context docs" +
+               (f" + {len(structured_data)} data fields" if structured_data else ""),
+    ))
 
     return AnswerResult(
         answer=rag_answer.answer,
@@ -121,6 +188,9 @@ def _rag_answer_to_result(rag_answer: Any) -> AnswerResult:
         sources=rag_answer.sources,
         structured_data=structured_data,
         expansion=expansion,
+        search_query=search_q[:300],
+        avg_distance=avg_dist,
+        pipeline_trace=trace,
     )
 
 
@@ -139,8 +209,8 @@ async def query(request: QueryRequest) -> QueryResponse:
 
     return QueryResponse(
         query=request.query,
-        naive=_rag_answer_to_result(naive_result),
-        enhanced=_rag_answer_to_result(enhanced_result),
+        naive=_rag_answer_to_result(naive_result, request.query),
+        enhanced=_rag_answer_to_result(enhanced_result, request.query),
         total_time_ms=total_ms,
     )
 
