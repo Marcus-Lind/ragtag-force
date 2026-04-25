@@ -1,0 +1,33 @@
+# LLM
+anthropic>=0.39.0
+
+# Embeddings
+sentence-transformers>=3.0.1
+
+# Vector store
+chromadb>=0.5.3
+
+# Ontology
+rdflib>=7.0.0
+
+# RAG orchestration
+llama-index>=0.10.68
+llama-index-vector-stores-chroma>=0.1.10
+llama-index-embeddings-huggingface>=0.3.1
+llama-index-llms-anthropic>=0.6.0
+
+# PDF parsing
+PyMuPDF>=1.24.9
+
+# Structured data
+pandas>=2.2.2
+
+# Frontend
+streamlit>=1.37.1
+
+# Utilities
+python-dotenv>=1.0.1
+requests>=2.32.3
+
+# Testing
+pytest>=8.3.2
