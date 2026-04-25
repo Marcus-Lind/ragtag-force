@@ -378,11 +378,11 @@ async def tdy_query(request: QueryRequest) -> QueryResponse:
 
 
 TDY_EXAMPLE_QUESTIONS = [
-    "What is the per diem rate for TDY travel to San Diego?",
-    "Can I drive my POV for TDY and get reimbursed for mileage?",
-    "What are the rules for long-term TDY per diem reduction?",
-    "How do I get a travel advance before my TDY trip?",
-    "What is the M&IE breakdown for a travel day?",
+    "I'm TDY to the Pentagon for a week — what's my lodging and meal allowance?",
+    "How much mileage reimbursement do I get if I drive my own car to Fort Liberty?",
+    "What are the per diem rates for a TDY assignment at Redstone Arsenal?",
+    "I need to fly to MacDill AFB for 30 days — what are my travel entitlements?",
+    "Can I rent a car during TDY at JBSA and what's the daily meal rate?",
 ]
 
 
