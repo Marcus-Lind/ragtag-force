@@ -71,6 +71,18 @@ class PipelineStep(BaseModel):
     highlight: bool = False
 
 
+class ResolutionStep(BaseModel):
+    """A single hop in an ontology resolution chain."""
+    label: str
+    value: str
+
+
+class ResolutionChain(BaseModel):
+    """A complete resolution chain for one entity from query text to structured result."""
+    input_term: str
+    steps: list[ResolutionStep] = []
+
+
 class AnswerResult(BaseModel):
     """A single RAG pipeline answer."""
     answer: str
@@ -83,6 +95,7 @@ class AnswerResult(BaseModel):
     search_query: str = ""
     avg_distance: Optional[float] = None
     pipeline_trace: list[PipelineStep] = []
+    resolution_chains: list[ResolutionChain] = []
 
 
 class QueryResponse(BaseModel):
@@ -102,6 +115,86 @@ class StatusResponse(BaseModel):
     ontology: bool = False
     ontology_triples: int = 0
     llm: bool = False
+
+
+def _build_resolution_chains(rag_answer: Any, structured_data: list) -> list[ResolutionChain]:
+    """Build ontology resolution chains showing how entities were resolved.
+
+    Traces the path from raw query text through SKOS concepts to structured data.
+    """
+    chains: list[ResolutionChain] = []
+    if not rag_answer.is_enhanced or not rag_answer.retrieval.expansion:
+        return chains
+
+    exp = rag_answer.retrieval.expansion
+    entities = exp.entities
+    if not entities or not hasattr(entities, "raw_matches"):
+        return chains
+
+    for input_term, uri in entities.raw_matches.items():
+        concept_name = str(uri).split("#")[-1]
+        steps: list[ResolutionStep] = []
+
+        steps.append(ResolutionStep(label="Matched as", value=f"altLabel of ex:{concept_name}"))
+
+        # Find the prefLabel (canonical name) from synonyms
+        for pref, alts in exp.synonyms.items():
+            if input_term in [a.lower() for a in alts] or input_term.lower() == pref.lower():
+                steps.append(ResolutionStep(label="Canonical name", value=pref))
+                if alts:
+                    steps.append(ResolutionStep(label="Also known as", value=", ".join(alts[:4])))
+                break
+
+        # Location code resolution (TDY)
+        loc_codes = getattr(exp, "location_codes", None) or getattr(exp, "locality_codes", None) or []
+        if loc_codes and hasattr(entities, "locations") and uri in getattr(entities, "locations", []):
+            code = loc_codes[0]
+            steps.append(ResolutionStep(label="Location code", value=code))
+            parts = code.split("_")
+            if len(parts) >= 2:
+                city = " ".join(parts[:-1]).title()
+                state = parts[-1]
+                steps.append(ResolutionStep(label="Resolved to", value=f"{city}, {state}"))
+
+        # Locality code resolution (benefits)
+        is_location = False
+        if loc_codes and hasattr(entities, "installations") and uri in getattr(entities, "installations", []):
+            steps.append(ResolutionStep(label="Locality code", value=loc_codes[0]))
+            is_location = True
+
+        # Track if this is a TDY location
+        if hasattr(entities, "locations") and uri in getattr(entities, "locations", []):
+            is_location = True
+
+        # Grade notation (benefits)
+        grade_notations = getattr(exp, "grade_notations", [])
+        if grade_notations and hasattr(entities, "ranks") and uri in getattr(entities, "ranks", []):
+            steps.append(ResolutionStep(label="Pay grade", value=grade_notations[0]))
+
+        # Related regulations — only for the first chain to avoid repetition
+        if exp.related_regulations and len(chains) == 0:
+            steps.append(ResolutionStep(
+                label="Governing regulation",
+                value=", ".join(exp.related_regulations[:2]),
+            ))
+
+        # Final structured data result — only for location entities
+        if is_location:
+            sd_keys = [s.key for s in structured_data]
+            if any("Per Diem" in k or "Lodging" in k or "M&IE" in k for k in sd_keys):
+                for s in structured_data:
+                    if "Total" in s.key:
+                        steps.append(ResolutionStep(label="GSA API result", value=s.value))
+                        break
+            elif any("BAH" in k for k in sd_keys):
+                for s in structured_data:
+                    if "BAH" in s.key:
+                        steps.append(ResolutionStep(label="SQLite result", value=s.value))
+                        break
+
+        chains.append(ResolutionChain(input_term=input_term, steps=steps))
+
+    return chains
 
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
@@ -181,6 +274,9 @@ def _rag_answer_to_result(rag_answer: Any, original_query: str) -> AnswerResult:
                (f" + {len(structured_data)} data fields" if structured_data else ""),
     ))
 
+    # Build resolution chains
+    chains = _build_resolution_chains(rag_answer, structured_data)
+
     return AnswerResult(
         answer=rag_answer.answer,
         error=rag_answer.error,
@@ -192,10 +288,8 @@ def _rag_answer_to_result(rag_answer: Any, original_query: str) -> AnswerResult:
         search_query=search_q[:300],
         avg_distance=avg_dist,
         pipeline_trace=trace,
+        resolution_chains=chains,
     )
-
-
-# ── Endpoints ───────────────────────────────────────────────────────────────
 
 @app.post("/api/query", response_model=QueryResponse)
 async def query(request: QueryRequest) -> QueryResponse:
@@ -344,6 +438,9 @@ def _tdy_answer_to_result(tdy_answer: Any, original_query: str) -> AnswerResult:
                (f" + {len(structured_data)} data fields" if structured_data else ""),
     ))
 
+    # Build resolution chains
+    chains = _build_resolution_chains(tdy_answer, structured_data)
+
     return AnswerResult(
         answer=tdy_answer.answer,
         error=tdy_answer.error,
@@ -355,6 +452,7 @@ def _tdy_answer_to_result(tdy_answer: Any, original_query: str) -> AnswerResult:
         search_query=search_q[:300],
         avg_distance=avg_dist,
         pipeline_trace=trace,
+        resolution_chains=chains,
     )
 
 

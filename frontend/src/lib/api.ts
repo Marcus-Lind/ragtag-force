@@ -19,6 +19,16 @@ export interface PipelineStep {
   highlight: boolean;
 }
 
+export interface ResolutionStep {
+  label: string;
+  value: string;
+}
+
+export interface ResolutionChain {
+  input_term: string;
+  steps: ResolutionStep[];
+}
+
 export interface AnswerResult {
   answer: string;
   error: string | null;
@@ -30,6 +40,7 @@ export interface AnswerResult {
   search_query: string;
   avg_distance: number | null;
   pipeline_trace: PipelineStep[];
+  resolution_chains: ResolutionChain[];
 }
 
 export interface QueryResponse {

@@ -6,7 +6,7 @@ import remarkGfm from "remark-gfm";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { AnswerResult } from "@/lib/api";
+import type { AnswerResult, ResolutionChain as ResolutionChainType } from "@/lib/api";
 
 interface AnswerCardProps {
   variant: "naive" | "enhanced";
@@ -71,6 +71,11 @@ export function AnswerCard({ variant, result, loading }: AnswerCardProps) {
       <CardContent className="space-y-4">
         {/* Pipeline Trace — always visible */}
         <PipelineTrace result={result} isEnhanced={isEnhanced} />
+
+        {/* Ontology Resolution Chain — enhanced only */}
+        {isEnhanced && result.resolution_chains && result.resolution_chains.length > 0 && (
+          <OntologyResolutionChain chains={result.resolution_chains} />
+        )}
 
         {/* Answer */}
         {result.error ? (
@@ -289,6 +294,45 @@ function PipelineTrace({ result, isEnhanced }: { result: AnswerResult; isEnhance
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+
+function OntologyResolutionChain({ chains }: { chains: ResolutionChainType[] }) {
+  if (!chains || chains.length === 0) return null;
+
+  return (
+    <div className="rounded-lg border border-amber-200 bg-gradient-to-br from-amber-50/50 to-orange-50/30 p-3">
+      <div className="text-[0.68rem] font-semibold uppercase tracking-wider text-amber-800 mb-3">
+        🔗 Ontology Resolution Chain
+      </div>
+      <div className="space-y-3">
+        {chains.map((chain, ci) => (
+          <div key={ci} className="space-y-1">
+            {/* Input term pill */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="inline-flex items-center rounded-md bg-white border border-amber-300 px-2 py-1 text-xs font-semibold text-amber-900 shadow-sm">
+                &ldquo;{chain.input_term}&rdquo;
+              </span>
+              {chain.steps.map((step, si) => (
+                <span key={si} className="contents">
+                  <span className="text-amber-400 text-xs">→</span>
+                  <span className="inline-flex flex-col rounded-md bg-white/80 border border-amber-200/60 px-2 py-1 max-w-[220px]">
+                    <span className="text-[0.6rem] text-amber-600 font-medium leading-tight">{step.label}</span>
+                    <span className="text-[0.68rem] text-foreground font-semibold leading-tight truncate" title={step.value}>
+                      {step.value}
+                    </span>
+                  </span>
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-2.5 text-[0.6rem] text-amber-700/60 italic">
+        Each term is resolved through the SKOS knowledge graph to enable precise structured data queries.
       </div>
     </div>
   );
