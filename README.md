@@ -22,22 +22,39 @@ Vector Search       Structured Lookup
      |                  |
      +--------+---------+
               v
-         Ollama LLM (local, offline)
+       Anthropic Claude Haiku 3.5
               |
               v
     Answer + Citations + Expanded Terms
 ```
 
-## Setup (3 steps)
+## Quick Start
+
+### Prerequisites
+- Python 3.11+
+- [Anthropic API key](https://console.anthropic.com/)
+
+### Setup
 ```bash
-# 1. Install dependencies
+# 1. Clone and install dependencies
+git clone https://github.com/Marcus-Lind/ragtag-force.git
+cd ragtag-force
 pip install -r requirements.txt
 
-# 2. Run setup (downloads data, builds DB, ingests docs)
-bash scripts/setup.sh
+# 2. Configure environment
+cp .env.example .env
+# Edit .env and add your ANTHROPIC_API_KEY
 
-# 3. Launch
+# 3. Run ingestion (parses PDFs, builds vector store + SQLite)
+python scripts/ingest.py
+
+# 4. Launch the app
 streamlit run src/ui/app.py
+```
+
+Or use the all-in-one setup script:
+```bash
+python scripts/setup.py
 ```
 
 ## Example Questions
@@ -47,12 +64,42 @@ streamlit run src/ui/app.py
 4. What housing allowance changes when I add a dependent?
 5. What regulation governs my entitlement to OHA overseas?
 
-## Datasets & APIs Used
+## How It Works
+
+### The Demo (Two Columns)
+The Streamlit UI shows **two answers side by side** for every question:
+
+| **Naive RAG** | **Ontology-Enhanced RAG** |
+|---|---|
+| Raw query → vector search → LLM | Query → SKOS expansion → enhanced search + structured data → LLM |
+| Misses synonyms and alternate terms | Expands "E-4" to include "SPC", "Specialist", "Corporal" |
+| No structured data | Queries SQLite for exact BAH/BAS/pay rates |
+| Generic citations | Precise regulation references (AR 37-104-4, DoD FMR chapters) |
+
+### Ontology (SKOS)
+- 46 concepts, 386 triples
+- Full synonym coverage for all enlisted (E-1→E-9) and officer (O-1→O-10) ranks
+- Installation-to-locality code mappings (Fort Campbell → CLARKSVILLE_TN)
+- Allowance-to-regulation links (BAH → AR 37-104-4, DoD FMR Vol 7A Ch. 26)
+
+### Data Pipeline
+- **4 DoD PDFs** parsed with PyMuPDF → 9,857 chunks → ChromaDB (bge-base-en-v1.5 embeddings)
+- **4 structured tables** in SQLite: BAH rates, enlisted pay, officer pay, BAS rates
+
+## Datasets & Sources
 - Army Publishing Directorate (armypubs.army.mil) — AR 37-104-4, AR 600-8-10
 - DoD Financial Management Regulation Vol 7A (comptroller.defense.gov)
 - Defense Travel Management Office BAH tables (defensetravel.dod.mil)
 - DFAS Military Pay Charts (dfas.mil)
 - Joint Travel Regulations (travel.dod.mil)
+
+## Testing
+```bash
+python -m pytest tests/ -v
+```
+
+## Alternative: Ollama (Local LLM)
+See [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md) for running with a local LLM instead of Anthropic.
 
 ## Team
 RAG-Tag Force | SCSP Hackathon 2026 | GenAI.mil Track
