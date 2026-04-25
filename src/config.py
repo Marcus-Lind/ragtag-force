@@ -33,7 +33,7 @@ DATA_STRUCTURED_PATH: Path = _PROJECT_ROOT / "data" / "structured"
 
 # ── LLM ──────────────────────────────────────────────────────────────
 ANTHROPIC_API_KEY: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
-ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-20250506")
+ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL")
 
 # ── Embeddings ───────────────────────────────────────────────────────
 EMBEDDING_MODEL: str = "BAAI/bge-base-en-v1.5"

@@ -55,7 +55,7 @@ class TestLLMClient:
 
     def test_unconfigured_client(self):
         """Client without API key reports not configured."""
-        client = LLMClient(api_key=None)
+        client = LLMClient(api_key="")
         assert not client.is_configured
 
     def test_placeholder_key_not_configured(self):
@@ -70,7 +70,7 @@ class TestLLMClient:
 
     def test_generate_without_key_raises(self):
         """Generating without API key raises ValueError."""
-        client = LLMClient(api_key=None)
+        client = LLMClient(api_key="")
         with pytest.raises(ValueError, match="API key"):
             client.generate("system", "user")
 

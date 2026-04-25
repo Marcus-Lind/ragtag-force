@@ -11,21 +11,25 @@ import anthropic
 from src.config import ANTHROPIC_API_KEY, ANTHROPIC_MODEL
 
 
+_UNSET = object()
+
+
 class LLMClient:
     """Wrapper around the Anthropic API client."""
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: Optional[str] = _UNSET,
         model: Optional[str] = None,
     ) -> None:
         """Initialize the LLM client.
 
         Args:
             api_key: Anthropic API key. Defaults to config value.
+                     Pass empty string to explicitly disable.
             model: Model identifier. Defaults to config value.
         """
-        self.api_key = api_key or ANTHROPIC_API_KEY
+        self.api_key = ANTHROPIC_API_KEY if api_key is _UNSET else api_key
         self.model = model or ANTHROPIC_MODEL
         self._client: Optional[anthropic.Anthropic] = None
 
