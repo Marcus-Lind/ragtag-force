@@ -1,0 +1,331 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex:   <http://ragtag-force.mil/ontology#> .
+
+# ============================================================================
+# RAG-Tag Force Military Entitlements Ontology
+# SKOS-based ontology for query expansion in military benefits RAG system
+# ============================================================================
+
+# ── Top-Level Concept Scheme ────────────────────────────────────────────────
+ex:MilitaryEntitlements a skos:ConceptScheme ;
+    skos:prefLabel "Military Entitlements Ontology"@en ;
+    skos:definition "SKOS ontology covering US military ranks, allowances, installations, dependency statuses, and governing regulations for benefits and entitlements navigation."@en .
+
+# ── Concept Classes (Top Concepts) ──────────────────────────────────────────
+ex:Rank a skos:Concept ;
+    skos:prefLabel "Rank"@en ;
+    skos:topConceptOf ex:MilitaryEntitlements ;
+    skos:definition "Military pay grades and associated ranks."@en .
+
+ex:Allowance a skos:Concept ;
+    skos:prefLabel "Allowance"@en ;
+    skos:topConceptOf ex:MilitaryEntitlements ;
+    skos:definition "Military pay allowances and entitlements."@en .
+
+ex:Installation a skos:Concept ;
+    skos:prefLabel "Installation"@en ;
+    skos:topConceptOf ex:MilitaryEntitlements ;
+    skos:definition "Military bases and installations."@en .
+
+ex:DependencyStatus a skos:Concept ;
+    skos:prefLabel "Dependency Status"@en ;
+    skos:topConceptOf ex:MilitaryEntitlements ;
+    skos:definition "Service member dependency classification for entitlements."@en .
+
+ex:Regulation a skos:Concept ;
+    skos:prefLabel "Regulation"@en ;
+    skos:topConceptOf ex:MilitaryEntitlements ;
+    skos:definition "Governing regulations and policy documents."@en .
+
+# ── Rank Categories ─────────────────────────────────────────────────────────
+ex:EnlistedRank a skos:Concept ;
+    skos:prefLabel "Enlisted Rank"@en ;
+    skos:altLabel "Enlisted"@en, "EM"@en ;
+    skos:broader ex:Rank ;
+    skos:definition "Enlisted pay grades E-1 through E-9."@en .
+
+ex:OfficerRank a skos:Concept ;
+    skos:prefLabel "Officer Rank"@en ;
+    skos:altLabel "Officer"@en, "Commissioned Officer"@en ;
+    skos:broader ex:Rank ;
+    skos:definition "Commissioned officer pay grades O-1 through O-10."@en .
+
+ex:WarrantOfficerRank a skos:Concept ;
+    skos:prefLabel "Warrant Officer Rank"@en ;
+    skos:altLabel "Warrant Officer"@en, "WO"@en ;
+    skos:broader ex:Rank ;
+    skos:definition "Warrant officer pay grades W-1 through W-5."@en .
+
+# ── Enlisted Ranks ──────────────────────────────────────────────────────────
+ex:E1 a skos:Concept ;
+    skos:prefLabel "Private"@en ;
+    skos:altLabel "PVT"@en, "E-1"@en, "E1"@en, "Private E-1"@en ;
+    skos:broader ex:EnlistedRank ;
+    skos:notation "E-1" ;
+    skos:definition "Pay grade E-1. Army: Private (PVT)."@en .
+
+ex:E2 a skos:Concept ;
+    skos:prefLabel "Private Second Class"@en ;
+    skos:altLabel "PV2"@en, "E-2"@en, "E2"@en, "Private E-2"@en ;
+    skos:broader ex:EnlistedRank ;
+    skos:narrower ex:E1 ;
+    skos:notation "E-2" ;
+    skos:definition "Pay grade E-2. Army: Private (PV2)."@en .
+
+ex:E3 a skos:Concept ;
+    skos:prefLabel "Private First Class"@en ;
+    skos:altLabel "PFC"@en, "E-3"@en, "E3"@en ;
+    skos:broader ex:EnlistedRank ;
+    skos:notation "E-3" ;
+    skos:definition "Pay grade E-3. Army: Private First Class (PFC)."@en .
+
+ex:E4 a skos:Concept ;
+    skos:prefLabel "Specialist"@en ;
+    skos:altLabel "SPC"@en, "E-4"@en, "E4"@en, "Corporal"@en, "CPL"@en, "Specialist Four"@en ;
+    skos:broader ex:EnlistedRank ;
+    skos:notation "E-4" ;
+    skos:definition "Pay grade E-4. Army: Specialist (SPC) or Corporal (CPL)."@en .
+
+ex:E5 a skos:Concept ;
+    skos:prefLabel "Sergeant"@en ;
+    skos:altLabel "SGT"@en, "E-5"@en, "E5"@en, "Buck Sergeant"@en ;
+    skos:broader ex:EnlistedRank ;
+    skos:notation "E-5" ;
+    skos:definition "Pay grade E-5. Army: Sergeant (SGT)."@en .
+
+ex:E6 a skos:Concept ;
+    skos:prefLabel "Staff Sergeant"@en ;
+    skos:altLabel "SSG"@en, "E-6"@en, "E6"@en ;
+    skos:broader ex:EnlistedRank ;
+    skos:notation "E-6" ;
+    skos:definition "Pay grade E-6. Army: Staff Sergeant (SSG)."@en .
+
+ex:E7 a skos:Concept ;
+    skos:prefLabel "Sergeant First Class"@en ;
+    skos:altLabel "SFC"@en, "E-7"@en, "E7"@en ;
+    skos:broader ex:EnlistedRank ;
+    skos:notation "E-7" ;
+    skos:definition "Pay grade E-7. Army: Sergeant First Class (SFC)."@en .
+
+ex:E8 a skos:Concept ;
+    skos:prefLabel "Master Sergeant"@en ;
+    skos:altLabel "MSG"@en, "E-8"@en, "E8"@en, "First Sergeant"@en, "1SG"@en ;
+    skos:broader ex:EnlistedRank ;
+    skos:notation "E-8" ;
+    skos:definition "Pay grade E-8. Army: Master Sergeant (MSG) or First Sergeant (1SG)."@en .
+
+ex:E9 a skos:Concept ;
+    skos:prefLabel "Sergeant Major"@en ;
+    skos:altLabel "SGM"@en, "E-9"@en, "E9"@en, "Command Sergeant Major"@en, "CSM"@en, "Sergeant Major of the Army"@en, "SMA"@en ;
+    skos:broader ex:EnlistedRank ;
+    skos:notation "E-9" ;
+    skos:definition "Pay grade E-9. Army: Sergeant Major (SGM), Command Sergeant Major (CSM), or Sergeant Major of the Army (SMA)."@en .
+
+# ── Officer Ranks ───────────────────────────────────────────────────────────
+ex:O1 a skos:Concept ;
+    skos:prefLabel "Second Lieutenant"@en ;
+    skos:altLabel "2LT"@en, "O-1"@en, "O1"@en, "2nd Lieutenant"@en, "2nd LT"@en ;
+    skos:broader ex:OfficerRank ;
+    skos:notation "O-1" ;
+    skos:definition "Pay grade O-1. Army: Second Lieutenant (2LT)."@en .
+
+ex:O2 a skos:Concept ;
+    skos:prefLabel "First Lieutenant"@en ;
+    skos:altLabel "1LT"@en, "O-2"@en, "O2"@en, "1st Lieutenant"@en, "1st LT"@en ;
+    skos:broader ex:OfficerRank ;
+    skos:notation "O-2" ;
+    skos:definition "Pay grade O-2. Army: First Lieutenant (1LT)."@en .
+
+ex:O3 a skos:Concept ;
+    skos:prefLabel "Captain"@en ;
+    skos:altLabel "CPT"@en, "O-3"@en, "O3"@en, "Capt"@en ;
+    skos:broader ex:OfficerRank ;
+    skos:notation "O-3" ;
+    skos:definition "Pay grade O-3. Army: Captain (CPT)."@en .
+
+ex:O4 a skos:Concept ;
+    skos:prefLabel "Major"@en ;
+    skos:altLabel "MAJ"@en, "O-4"@en, "O4"@en ;
+    skos:broader ex:OfficerRank ;
+    skos:notation "O-4" ;
+    skos:definition "Pay grade O-4. Army: Major (MAJ)."@en .
+
+ex:O5 a skos:Concept ;
+    skos:prefLabel "Lieutenant Colonel"@en ;
+    skos:altLabel "LTC"@en, "O-5"@en, "O5"@en, "Lt Col"@en ;
+    skos:broader ex:OfficerRank ;
+    skos:notation "O-5" ;
+    skos:definition "Pay grade O-5. Army: Lieutenant Colonel (LTC)."@en .
+
+ex:O6 a skos:Concept ;
+    skos:prefLabel "Colonel"@en ;
+    skos:altLabel "COL"@en, "O-6"@en, "O6"@en ;
+    skos:broader ex:OfficerRank ;
+    skos:notation "O-6" ;
+    skos:definition "Pay grade O-6. Army: Colonel (COL)."@en .
+
+ex:O7 a skos:Concept ;
+    skos:prefLabel "Brigadier General"@en ;
+    skos:altLabel "BG"@en, "O-7"@en, "O7"@en, "One Star"@en ;
+    skos:broader ex:OfficerRank ;
+    skos:notation "O-7" ;
+    skos:definition "Pay grade O-7. Army: Brigadier General (BG)."@en .
+
+ex:O8 a skos:Concept ;
+    skos:prefLabel "Major General"@en ;
+    skos:altLabel "MG"@en, "O-8"@en, "O8"@en, "Two Star"@en ;
+    skos:broader ex:OfficerRank ;
+    skos:notation "O-8" ;
+    skos:definition "Pay grade O-8. Army: Major General (MG)."@en .
+
+ex:O9 a skos:Concept ;
+    skos:prefLabel "Lieutenant General"@en ;
+    skos:altLabel "LTG"@en, "O-9"@en, "O9"@en, "Three Star"@en ;
+    skos:broader ex:OfficerRank ;
+    skos:notation "O-9" ;
+    skos:definition "Pay grade O-9. Army: Lieutenant General (LTG)."@en .
+
+ex:O10 a skos:Concept ;
+    skos:prefLabel "General"@en ;
+    skos:altLabel "GEN"@en, "O-10"@en, "O10"@en, "Four Star"@en ;
+    skos:broader ex:OfficerRank ;
+    skos:notation "O-10" ;
+    skos:definition "Pay grade O-10. Army: General (GEN)."@en .
+
+# ── Allowances ──────────────────────────────────────────────────────────────
+ex:BAH a skos:Concept ;
+    skos:prefLabel "Basic Allowance for Housing"@en ;
+    skos:altLabel "BAH"@en, "Housing Allowance"@en, "BAH Rate"@en ;
+    skos:broader ex:Allowance ;
+    skos:related ex:AR_37_104_4, ex:DoD_FMR_7A_Ch26 ;
+    skos:definition "Basic Allowance for Housing (BAH) offsets housing costs for service members. Governed by AR 37-104-4 and DoD FMR Vol 7A Chapter 26. Rates vary by pay grade, dependency status, and duty station locality."@en .
+
+ex:BAS a skos:Concept ;
+    skos:prefLabel "Basic Allowance for Subsistence"@en ;
+    skos:altLabel "BAS"@en, "Food Allowance"@en, "Meal Allowance"@en, "Subsistence Allowance"@en ;
+    skos:broader ex:Allowance ;
+    skos:related ex:DoD_FMR_7A_Ch25 ;
+    skos:definition "Basic Allowance for Subsistence (BAS) offsets food costs. Governed by DoD FMR Vol 7A Chapter 25. Two flat rates: one for enlisted, one for officers."@en .
+
+ex:OHA a skos:Concept ;
+    skos:prefLabel "Overseas Housing Allowance"@en ;
+    skos:altLabel "OHA"@en, "Overseas Housing"@en, "OCONUS Housing Allowance"@en ;
+    skos:broader ex:Allowance ;
+    skos:related ex:DoD_FMR_7A_Ch68 ;
+    skos:definition "Overseas Housing Allowance (OHA) for service members stationed outside the continental US (OCONUS). Governed by DoD FMR Vol 7A Chapter 68."@en .
+
+ex:BasePay a skos:Concept ;
+    skos:prefLabel "Base Pay"@en ;
+    skos:altLabel "Basic Pay"@en, "Military Pay"@en, "Monthly Pay"@en ;
+    skos:broader ex:Allowance ;
+    skos:related ex:AR_37_104_4 ;
+    skos:definition "Base pay determined by pay grade and years of service. Published in annual military pay charts by DFAS."@en .
+
+ex:LeaveAccrual a skos:Concept ;
+    skos:prefLabel "Leave Accrual"@en ;
+    skos:altLabel "Annual Leave"@en, "Leave Days"@en, "Military Leave"@en, "PTO"@en, "Vacation"@en ;
+    skos:broader ex:Allowance ;
+    skos:related ex:AR_600_8_10 ;
+    skos:definition "Service members accrue 2.5 days of leave per month (30 days per year). Governed by AR 600-8-10."@en .
+
+# ── Installations ───────────────────────────────────────────────────────────
+ex:FortCampbell a skos:Concept ;
+    skos:prefLabel "Fort Campbell"@en ;
+    skos:altLabel "Ft Campbell"@en, "Campbell"@en, "Fort Campbell KY"@en ;
+    skos:broader ex:Installation ;
+    skos:notation "CLARKSVILLE_TN" ;
+    skos:definition "Fort Campbell, Kentucky. BAH locality code: CLARKSVILLE_TN. Home of 101st Airborne Division."@en .
+
+ex:FortLiberty a skos:Concept ;
+    skos:prefLabel "Fort Liberty"@en ;
+    skos:altLabel "Fort Bragg"@en, "Ft Bragg"@en, "Ft Liberty"@en, "Bragg"@en, "Liberty"@en, "Fort Liberty NC"@en, "Fort Bragg NC"@en ;
+    skos:broader ex:Installation ;
+    skos:notation "FAYETTEVILLE_NC" ;
+    skos:definition "Fort Liberty (formerly Fort Bragg), North Carolina. BAH locality code: FAYETTEVILLE_NC. Home of XVIII Airborne Corps and 82nd Airborne Division."@en .
+
+ex:FortCavazos a skos:Concept ;
+    skos:prefLabel "Fort Cavazos"@en ;
+    skos:altLabel "Fort Hood"@en, "Ft Hood"@en, "Ft Cavazos"@en, "Hood"@en, "Cavazos"@en, "Fort Cavazos TX"@en, "Fort Hood TX"@en ;
+    skos:broader ex:Installation ;
+    skos:notation "KILLEEN_TX" ;
+    skos:definition "Fort Cavazos (formerly Fort Hood), Texas. BAH locality code: KILLEEN_TX. Home of III Armored Corps and 1st Cavalry Division."@en .
+
+ex:JBLM a skos:Concept ;
+    skos:prefLabel "Joint Base Lewis-McChord"@en ;
+    skos:altLabel "JBLM"@en, "Fort Lewis"@en, "Ft Lewis"@en, "Lewis-McChord"@en, "McChord"@en, "Fort Lewis WA"@en ;
+    skos:broader ex:Installation ;
+    skos:notation "OLYMPIA_WA" ;
+    skos:definition "Joint Base Lewis-McChord (JBLM), Washington. BAH locality code: OLYMPIA_WA. Home of I Corps and 2nd Infantry Division."@en .
+
+ex:Pentagon a skos:Concept ;
+    skos:prefLabel "Pentagon"@en ;
+    skos:altLabel "Washington DC"@en, "DC"@en, "NCR"@en, "National Capital Region"@en ;
+    skos:broader ex:Installation ;
+    skos:notation "WASHINGTON_DC" ;
+    skos:definition "Pentagon / National Capital Region. BAH locality code: WASHINGTON_DC."@en .
+
+# ── Dependency Status ───────────────────────────────────────────────────────
+ex:WithDependents a skos:Concept ;
+    skos:prefLabel "With Dependents"@en ;
+    skos:altLabel "Married"@en, "With Family"@en, "Dependent Rate"@en, "w/ dependents"@en ;
+    skos:broader ex:DependencyStatus ;
+    skos:notation "with_dependents" ;
+    skos:definition "Service member has one or more dependents (spouse, children, or other qualifying dependents)."@en .
+
+ex:WithoutDependents a skos:Concept ;
+    skos:prefLabel "Without Dependents"@en ;
+    skos:altLabel "Single"@en, "No Dependents"@en, "Single Rate"@en, "w/o dependents"@en, "Unmarried"@en ;
+    skos:broader ex:DependencyStatus ;
+    skos:notation "without_dependents" ;
+    skos:definition "Service member has no dependents."@en .
+
+# ── Regulations ─────────────────────────────────────────────────────────────
+ex:AR_37_104_4 a skos:Concept ;
+    skos:prefLabel "AR 37-104-4"@en ;
+    skos:altLabel "Army Regulation 37-104-4"@en, "Military Pay and Allowances Policy"@en ;
+    skos:broader ex:Regulation ;
+    skos:related ex:BAH, ex:BasePay ;
+    skos:definition "AR 37-104-4: Military Pay and Allowances Policy. Governs BAH, base pay, and other allowances."@en .
+
+ex:AR_600_8_10 a skos:Concept ;
+    skos:prefLabel "AR 600-8-10"@en ;
+    skos:altLabel "Army Regulation 600-8-10"@en, "Leaves and Passes"@en ;
+    skos:broader ex:Regulation ;
+    skos:related ex:LeaveAccrual ;
+    skos:definition "AR 600-8-10: Leaves and Passes. Governs leave accrual, types of leave, and pass policies."@en .
+
+ex:DoD_FMR_7A_Ch25 a skos:Concept ;
+    skos:prefLabel "DoD FMR Vol 7A Chapter 25"@en ;
+    skos:altLabel "FMR 7A Ch 25"@en, "BAS Regulation"@en ;
+    skos:broader ex:Regulation ;
+    skos:related ex:BAS ;
+    skos:definition "DoD Financial Management Regulation Volume 7A, Chapter 25: Basic Allowance for Subsistence."@en .
+
+ex:DoD_FMR_7A_Ch26 a skos:Concept ;
+    skos:prefLabel "DoD FMR Vol 7A Chapter 26"@en ;
+    skos:altLabel "FMR 7A Ch 26"@en, "BAH Regulation"@en ;
+    skos:broader ex:Regulation ;
+    skos:related ex:BAH ;
+    skos:definition "DoD Financial Management Regulation Volume 7A, Chapter 26: Basic Allowance for Housing."@en .
+
+ex:DoD_FMR_7A_Ch68 a skos:Concept ;
+    skos:prefLabel "DoD FMR Vol 7A Chapter 68"@en ;
+    skos:altLabel "FMR 7A Ch 68"@en, "OHA Regulation"@en ;
+    skos:broader ex:Regulation ;
+    skos:related ex:OHA ;
+    skos:definition "DoD Financial Management Regulation Volume 7A, Chapter 68: Overseas Housing Allowance."@en .
+
+ex:JTR a skos:Concept ;
+    skos:prefLabel "Joint Travel Regulations"@en ;
+    skos:altLabel "JTR"@en, "Joint Travel Reg"@en, "Travel Regulations"@en, "Per Diem"@en, "TDY Travel"@en ;
+    skos:broader ex:Regulation ;
+    skos:definition "Joint Travel Regulations (JTR): Governs travel and transportation allowances for uniformed service members and DoD civilian employees."@en .
+
+ex:DoD_FMR_7A a skos:Concept ;
+    skos:prefLabel "DoD FMR Volume 7A"@en ;
+    skos:altLabel "DoD Financial Management Regulation"@en, "FMR Vol 7A"@en, "DoD FMR"@en ;
+    skos:broader ex:Regulation ;
+    skos:narrower ex:DoD_FMR_7A_Ch25, ex:DoD_FMR_7A_Ch26, ex:DoD_FMR_7A_Ch68 ;
+    skos:definition "DoD Financial Management Regulation Volume 7A: Military Pay Policy and Procedures."@en .
