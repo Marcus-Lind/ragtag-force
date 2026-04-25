@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -76,8 +78,38 @@ export function AnswerCard({ variant, result, loading }: AnswerCardProps) {
             {result.error}
           </div>
         ) : (
-          <div className="text-sm leading-relaxed whitespace-pre-wrap">
-            {result.answer}
+          <div className="prose-answer text-sm leading-relaxed">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({ children }) => <h3 className="text-base font-bold mt-3 mb-1.5 text-foreground">{children}</h3>,
+                h2: ({ children }) => <h4 className="text-sm font-semibold mt-2.5 mb-1 text-foreground">{children}</h4>,
+                h3: ({ children }) => <h5 className="text-sm font-semibold mt-2 mb-1 text-foreground">{children}</h5>,
+                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-0.5">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-0.5">{children}</ol>,
+                li: ({ children }) => <li className="text-sm">{children}</li>,
+                strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                code: ({ children }) => (
+                  <code className="rounded bg-muted px-1.5 py-0.5 text-xs font-mono">{children}</code>
+                ),
+                pre: ({ children }) => (
+                  <pre className="rounded-md bg-muted p-3 text-xs font-mono overflow-x-auto mb-2">{children}</pre>
+                ),
+                table: ({ children }) => (
+                  <div className="overflow-x-auto mb-2">
+                    <table className="min-w-full text-xs border-collapse">{children}</table>
+                  </div>
+                ),
+                th: ({ children }) => <th className="border border-border px-2 py-1 bg-muted font-semibold text-left">{children}</th>,
+                td: ({ children }) => <td className="border border-border px-2 py-1">{children}</td>,
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-2 border-amber-400 pl-3 italic text-muted-foreground mb-2">{children}</blockquote>
+                ),
+              }}
+            >
+              {result.answer}
+            </ReactMarkdown>
           </div>
         )}
 
