@@ -54,10 +54,11 @@ export interface StatusResponse {
   chromadb: boolean;
   chromadb_count: number;
   sqlite: boolean;
-  sqlite_bah_count: number;
+  sqlite_rows: number;
   ontology: boolean;
   ontology_triples: number;
   llm: boolean;
+  live_apis: number;
 }
 
 export async function fetchStatus(): Promise<StatusResponse> {

@@ -11,7 +11,7 @@ export function Sidebar({ status }: SidebarProps) {
       <div className="px-5 pt-6 pb-4">
         <div className="text-lg font-bold tracking-tight">🪖 RAG-Tag Force</div>
         <div className="mt-1 text-xs text-slate-400">
-          Ontology Enhanced RAG for Military Benefits
+          Ontology Enhanced RAG for Military Domains
         </div>
       </div>
 
@@ -33,44 +33,23 @@ export function Sidebar({ status }: SidebarProps) {
           <StatusRow
             label="Structured DB"
             ok={status?.sqlite ?? false}
-            value={status?.sqlite ? `${status.sqlite_bah_count} rates` : "Empty"}
+            value={status?.sqlite ? `${status.sqlite_rows.toLocaleString()} rows` : "Empty"}
           />
           <StatusRow
             label="SKOS Ontology"
             ok={status?.ontology ?? false}
-            value={status?.ontology ? `${status.ontology_triples} triples` : "Not loaded"}
+            value={status?.ontology ? `${status.ontology_triples.toLocaleString()} triples` : "Not loaded"}
+          />
+          <StatusRow
+            label="Live APIs"
+            ok={(status?.live_apis ?? 0) > 0}
+            value={(status?.live_apis ?? 0) > 0 ? `${status!.live_apis} connected` : "None"}
           />
           <StatusRow
             label="LLM (Anthropic)"
             ok={status?.llm ?? false}
             value={status?.llm ? "Connected" : "No key"}
           />
-        </div>
-      </div>
-
-      <div className="mx-5">
-        <Separator className="bg-white/10" />
-      </div>
-
-      {/* How It Works */}
-      <div className="px-5 py-4 flex-1">
-        <div className="text-[0.65rem] font-semibold uppercase tracking-wider text-slate-400 mb-3">
-          How It Works
-        </div>
-        <div className="text-xs text-slate-300 leading-relaxed space-y-3">
-          <p>
-            <span className="font-semibold text-white">The Problem:</span> Naive
-            RAG fails military personnel because &ldquo;SPC&rdquo;,
-            &ldquo;Specialist&rdquo;, and &ldquo;E-4&rdquo; are the same rank
-            &mdash; but vector search doesn&apos;t know that.
-          </p>
-          <p>
-            <span className="font-semibold text-white">Our Solution:</span> A
-            SKOS ontology layer expands queries with synonyms, rank hierarchies,
-            installation-to-locality mappings, and regulation links &mdash; then
-            augments retrieval with authoritative structured data from official
-            rate tables.
-          </p>
         </div>
       </div>
 

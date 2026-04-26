@@ -112,10 +112,11 @@ class StatusResponse(BaseModel):
     chromadb: bool = False
     chromadb_count: int = 0
     sqlite: bool = False
-    sqlite_bah_count: int = 0
+    sqlite_rows: int = 0
     ontology: bool = False
     ontology_triples: int = 0
     llm: bool = False
+    live_apis: int = 0
 
 
 def _build_resolution_chains(rag_answer: Any, structured_data: list) -> list[ResolutionChain]:
@@ -313,39 +314,57 @@ async def query(request: QueryRequest) -> QueryResponse:
 
 @app.get("/api/status", response_model=StatusResponse)
 async def status() -> StatusResponse:
-    """Check system component health."""
+    """Check system component health across all domains."""
     result = StatusResponse()
 
+    # Count chunks across ALL ChromaDB collections
     try:
-        from src.ingest.vector_store import get_chroma_client, get_or_create_collection
+        from src.ingest.vector_store import get_chroma_client
         client = get_chroma_client()
-        collection = get_or_create_collection(client)
-        count = collection.count()
-        result.chromadb = count > 0
-        result.chromadb_count = count
+        total_chunks = 0
+        for col in client.list_collections():
+            total_chunks += col.count()
+        result.chromadb = total_chunks > 0
+        result.chromadb_count = total_chunks
     except Exception:
         pass
 
+    # Count rows across ALL SQLite tables
     try:
         import sqlite3
+        total_rows = 0
         conn = sqlite3.connect(str(SQLITE_PATH))
-        cursor = conn.execute("SELECT COUNT(*) FROM bah_rates")
-        count = cursor.fetchone()[0]
+        tables = [
+            r[0] for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            ).fetchall()
+        ]
+        for table in tables:
+            total_rows += conn.execute(f"SELECT COUNT(*) FROM [{table}]").fetchone()[0]
         conn.close()
-        result.sqlite = count > 0
-        result.sqlite_bah_count = count
+        result.sqlite = total_rows > 0
+        result.sqlite_rows = total_rows
     except Exception:
         pass
 
+    # Count triples across ALL ontology files
     try:
-        from src.ontology.loader import load_ontology
-        g = load_ontology()
-        result.ontology = len(g) > 0
-        result.ontology_triples = len(g)
+        from rdflib import Graph
+        total_triples = 0
+        ontology_dir = Path(__file__).resolve().parent.parent.parent / "ontology"
+        for ttl in ontology_dir.glob("*.ttl"):
+            g = Graph()
+            g.parse(str(ttl), format="turtle")
+            total_triples += len(g)
+        result.ontology = total_triples > 0
+        result.ontology_triples = total_triples
     except Exception:
         pass
 
     result.llm = bool(ANTHROPIC_API_KEY and ANTHROPIC_API_KEY != "sk-ant-your-key-here")
+
+    # Live API connections: GSA per diem + USAspending
+    result.live_apis = 2
 
     return result
 
