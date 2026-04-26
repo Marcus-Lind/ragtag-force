@@ -1,7 +1,7 @@
 """Ingest federal contracting reference content into ChromaDB.
 
-Reads markdown documents from data/documents/contracts/ and ingests them
-into a 'contracts_documents' ChromaDB collection. Idempotent.
+Reads markdown documents and PDF files from data/documents/contracts/
+and ingests them into a 'contracts_documents' ChromaDB collection. Idempotent.
 """
 
 import sys
@@ -10,6 +10,8 @@ from pathlib import Path
 _project_root = Path(__file__).resolve().parent.parent
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
+
+import fitz  # PyMuPDF
 
 from src.ingest.embeddings import embed_texts
 from src.ingest.vector_store import get_chroma_client
@@ -56,6 +58,75 @@ def _chunk_markdown(text: str, source_name: str, max_chars: int = 1500) -> list[
     return chunks
 
 
+def _chunk_pdf(pdf_path: Path, max_chars: int = 1500) -> list[dict]:
+    """Extract text from PDF and split into chunks with metadata.
+
+    Skips boilerplate navigation pages (e.g. CRS header pages) and chunks
+    the real content by page, splitting large pages at paragraph breaks.
+    """
+    doc = fitz.open(pdf_path)
+    source_name = pdf_path.stem.replace("_", " ").title()
+    chunks: list[dict] = []
+
+    for page_num in range(len(doc)):
+        text = doc[page_num].get_text().strip()
+
+        # Skip very short pages or navigation/boilerplate
+        if len(text) < 100:
+            continue
+        # Skip CRS website wrapper pages
+        if "skip to main content" in text.lower() or "enable\nJavaScript" in text:
+            continue
+        if text.startswith("Publication Date:") or "Download PDF" in text[:200]:
+            continue
+
+        # If page text is short enough, keep as one chunk
+        if len(text) <= max_chars:
+            chunks.append({
+                "text": text,
+                "metadata": {
+                    "source_doc": source_name,
+                    "section_heading": f"Page {page_num + 1}",
+                },
+            })
+        else:
+            # Split on double newlines (paragraphs)
+            paragraphs = text.split("\n\n")
+            current_chunk: list[str] = []
+            current_len = 0
+            chunk_idx = 0
+
+            for para in paragraphs:
+                para = para.strip()
+                if not para:
+                    continue
+                if current_len + len(para) > max_chars and current_chunk:
+                    chunks.append({
+                        "text": "\n\n".join(current_chunk),
+                        "metadata": {
+                            "source_doc": source_name,
+                            "section_heading": f"Page {page_num + 1} part {chunk_idx + 1}",
+                        },
+                    })
+                    chunk_idx += 1
+                    current_chunk = []
+                    current_len = 0
+                current_chunk.append(para)
+                current_len += len(para)
+
+            if current_chunk:
+                chunks.append({
+                    "text": "\n\n".join(current_chunk),
+                    "metadata": {
+                        "source_doc": source_name,
+                        "section_heading": f"Page {page_num + 1} part {chunk_idx + 1}",
+                    },
+                })
+
+    doc.close()
+    return chunks
+
+
 def ingest_contracts_content() -> int:
     """Ingest contracts reference content into ChromaDB.
 
@@ -89,6 +160,13 @@ def ingest_contracts_content() -> int:
         chunks = _chunk_markdown(text, source_name)
         all_chunks.extend(chunks)
         print(f"  {md_file.name}: {len(chunks)} chunks")
+
+    # Read all PDF files
+    pdf_files = sorted(CONTRACTS_DIR.glob("*.pdf"))
+    for pdf_file in pdf_files:
+        chunks = _chunk_pdf(pdf_file)
+        all_chunks.extend(chunks)
+        print(f"  {pdf_file.name}: {len(chunks)} chunks (PDF)")
 
     if not all_chunks:
         print("No contract documents found!")
