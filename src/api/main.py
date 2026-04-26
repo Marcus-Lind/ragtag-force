@@ -528,10 +528,10 @@ async def tdy_query(request: QueryRequest) -> QueryResponse:
 
 
 TDY_EXAMPLE_QUESTIONS = [
+    "What is the per diem rate for TDY to Fort Liberty?",
     "I'm TDY to the Pentagon for a week — what's my lodging and meal allowance?",
     "How much mileage reimbursement do I get if I drive my own car to Fort Liberty?",
     "What are the per diem rates for a TDY assignment at Redstone Arsenal?",
-    "I need to fly to MacDill AFB for 30 days — what are my travel entitlements?",
     "Can I rent a car during TDY at JBSA and what's the daily meal rate?",
 ]
 
@@ -734,9 +734,9 @@ async def contracts_query(request: QueryRequest) -> QueryResponse:
 
 
 CONTRACTS_EXAMPLE_QUESTIONS = [
+    "Find contracts for autonomous systems at Aberdeen Proving Ground",
     "What AI research contracts were awarded near Redstone Arsenal?",
     "Show me recent cybersecurity contracts from Lockheed Martin",
-    "Find contracts for autonomous systems at Aberdeen Proving Ground",
     "What logistics contracts were awarded near Fort Liberty?",
     "Find hypersonics research contracts in Alabama",
 ]
