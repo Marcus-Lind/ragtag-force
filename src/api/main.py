@@ -665,11 +665,11 @@ async def contracts_query(request: QueryRequest) -> QueryResponse:
 
 
 CONTRACTS_EXAMPLE_QUESTIONS = [
-    "What AI research contracts has the Army awarded near Redstone Arsenal?",
+    "What AI research contracts were awarded near Redstone Arsenal?",
     "Show me recent cybersecurity contracts from Lockheed Martin",
-    "What's the DoD spending on R&D in Colorado Springs?",
     "Find contracts for autonomous systems at Aberdeen Proving Ground",
     "What logistics contracts were awarded near Fort Liberty?",
+    "Find hypersonics research contracts in Alabama",
 ]
 
 

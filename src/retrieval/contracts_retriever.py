@@ -96,36 +96,38 @@ def _gather_contract_structured_data(expansion: Optional[ContractQueryExpansion]
     if not expansion or not expansion.entities or not expansion.entities.has_entities:
         return {}
 
-    # Build API query from ontology-resolved parameters
+    # Build API query from ontology-resolved parameters.
+    # Strategy: use keywords (from research domain prefLabel) as primary filter.
+    # Don't use agency_name or naics_codes — they over-filter when combined
+    # with recipient_locations (which is HQ-based, not work-location).
+    from src.ontology.contracts_expander import _get_all_labels, load_contracts_ontology
+    graph = load_contracts_ontology()
+
     keywords = None
     for uri in expansion.entities.research_domains:
-        from src.ontology.contracts_expander import _get_all_labels, load_contracts_ontology
-        graph = load_contracts_ontology()
         labels = _get_all_labels(graph, uri)
         if labels:
-            keywords = [labels[0]]
+            pref = labels[0]
+            # Split compound labels (e.g. "Logistics and Supply Chain" → ["logistics", "supply chain"])
+            if " and " in pref.lower():
+                keywords = [part.strip() for part in pref.split(" and ")]
+            else:
+                keywords = [pref]
             break
 
-    # If no research domain but we have keywords from the original query
+    # If no research domain, use meaningful expanded terms as keywords
     if not keywords and expansion.expanded_terms:
-        # Use the first few meaningful expanded terms as keywords
         domain_terms = [t for t in expansion.expanded_terms[:3] if len(t) > 3]
         if domain_terms:
             keywords = domain_terms[:2]
 
-    agency_name = "Department of Defense"
-    if expansion.agency_names:
-        # Use the most specific agency
-        agency_name = expansion.agency_names[0]
-
-    naics_codes = expansion.naics_codes if expansion.naics_codes else None
     state_code = expansion.state_codes[0] if expansion.state_codes else None
     contractor_name = expansion.contractor_names[0] if expansion.contractor_names else None
 
     result = search_contracts(
         keywords=keywords,
-        agency_name=agency_name,
-        naics_codes=naics_codes,
+        agency_name=None,
+        naics_codes=None,
         state_code=state_code,
         recipient_name=contractor_name,
         limit=5,
