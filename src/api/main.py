@@ -21,6 +21,7 @@ from src.config import ANTHROPIC_API_KEY, SQLITE_PATH
 from src.llm.client import LLMClient
 from src.llm.generator import generate_naive_answer, generate_enhanced_answer
 from src.llm.tdy_generator import generate_tdy_naive_answer, generate_tdy_enhanced_answer
+from src.llm.contracts_generator import generate_contracts_naive_answer, generate_contracts_enhanced_answer
 
 app = FastAPI(
     title="RAG-Tag Force API",
@@ -488,3 +489,191 @@ TDY_EXAMPLE_QUESTIONS = [
 async def tdy_examples() -> list[str]:
     """Return TDY travel example questions."""
     return TDY_EXAMPLE_QUESTIONS
+
+
+# ── Federal Contract Intelligence Domain ───────────────────────────────────
+
+def _contracts_answer_to_result(contracts_answer: Any, original_query: str) -> AnswerResult:
+    """Convert a ContractRAGAnswer dataclass to an API response model."""
+    structured_data = []
+    if contracts_answer.retrieval.structured_data:
+        for k, v in contracts_answer.retrieval.structured_data.items():
+            structured_data.append(StructuredDataItem(key=k, value=str(v)))
+
+    expansion = None
+    expanded_query = ""
+    if contracts_answer.retrieval.expansion:
+        exp = contracts_answer.retrieval.expansion
+        expansion = ExpansionDetail(
+            synonyms=exp.synonyms or {},
+            related_regulations=exp.related_regulations or [],
+            locality_codes=exp.state_codes or [],
+            grade_notations=[],
+            dependency_statuses=[],
+        )
+        expanded_query = exp.expanded_query
+
+    distances = [
+        d.get("distance")
+        for d in contracts_answer.retrieval.documents
+        if d.get("distance") is not None
+    ]
+    avg_dist = sum(distances) / len(distances) if distances else None
+
+    # Build pipeline trace
+    trace: list[PipelineStep] = []
+    is_enhanced = contracts_answer.is_enhanced
+
+    trace.append(PipelineStep(label="Input Query", detail=original_query))
+
+    if is_enhanced and contracts_answer.retrieval.expansion:
+        ent = contracts_answer.retrieval.expansion.entities
+        trace.append(PipelineStep(
+            label="Contract Entity Extraction",
+            detail=f"Found {len(ent.service_branches) if ent else 0} agencies, "
+                   f"{len(ent.research_domains) if ent else 0} research domains, "
+                   f"{len(ent.locations) if ent else 0} locations, "
+                   f"{len(ent.contractors) if ent else 0} contractors",
+            highlight=True,
+        ))
+        trace.append(PipelineStep(
+            label="SKOS Expansion",
+            detail=f"Resolved to {len(contracts_answer.retrieval.expansion.naics_codes)} NAICS codes, "
+                   f"{len(contracts_answer.retrieval.expansion.state_codes)} states, "
+                   f"{len(contracts_answer.retrieval.expansion.agency_names)} agencies",
+            highlight=True,
+        ))
+
+    search_q = expanded_query if is_enhanced else original_query
+    trace.append(PipelineStep(
+        label="Vector Search (Procurement Docs)",
+        detail=f"Searched {len(contracts_answer.retrieval.documents)} docs (avg distance: {avg_dist:.3f})" if avg_dist else f"Retrieved {len(contracts_answer.retrieval.documents)} documents",
+    ))
+
+    if is_enhanced and structured_data:
+        trace.append(PipelineStep(
+            label="USAspending.gov API",
+            detail=f"Live query returned {len(structured_data)} fields from usaspending.gov",
+            highlight=True,
+        ))
+    elif not is_enhanced:
+        trace.append(PipelineStep(
+            label="Contract Data Lookup",
+            detail="Skipped - basic pipeline cannot resolve entities to API parameters",
+        ))
+
+    trace.append(PipelineStep(
+        label="LLM Generation",
+        detail=f"Claude Haiku with {len(contracts_answer.retrieval.documents)} context docs" +
+               (f" + {len(structured_data)} data fields" if structured_data else ""),
+    ))
+
+    # Build resolution chains for contracts
+    chains = _build_contracts_resolution_chains(contracts_answer, structured_data)
+
+    return AnswerResult(
+        answer=contracts_answer.answer,
+        error=contracts_answer.error,
+        retrieval_time_ms=contracts_answer.retrieval.retrieval_time_ms,
+        document_count=len(contracts_answer.retrieval.documents),
+        sources=contracts_answer.sources,
+        structured_data=structured_data,
+        expansion=expansion,
+        search_query=search_q[:300],
+        avg_distance=avg_dist,
+        pipeline_trace=trace,
+        resolution_chains=chains,
+    )
+
+
+def _build_contracts_resolution_chains(contracts_answer: Any, structured_data: list) -> list[ResolutionChain]:
+    """Build resolution chains specific to the contracts domain."""
+    chains: list[ResolutionChain] = []
+    if not contracts_answer.is_enhanced or not contracts_answer.retrieval.expansion:
+        return chains
+
+    exp = contracts_answer.retrieval.expansion
+    entities = exp.entities
+    if not entities or not hasattr(entities, "raw_matches"):
+        return chains
+
+    for input_term, uri in entities.raw_matches.items():
+        concept_name = str(uri).split("#")[-1]
+        steps: list[ResolutionStep] = []
+
+        steps.append(ResolutionStep(label="Matched as", value=f"altLabel of ex:{concept_name}"))
+
+        for pref, alts in exp.synonyms.items():
+            if input_term in [a.lower() for a in alts] or input_term.lower() == pref.lower():
+                steps.append(ResolutionStep(label="Canonical name", value=pref))
+                if alts:
+                    steps.append(ResolutionStep(label="Also known as", value=", ".join(alts[:4])))
+                break
+
+        # NAICS code resolution
+        if uri in entities.research_domains and exp.naics_codes:
+            from src.ontology.contracts_expander import _get_notation, load_contracts_ontology
+            graph = load_contracts_ontology()
+            notation = _get_notation(graph, uri)
+            if notation:
+                steps.append(ResolutionStep(label="NAICS code", value=notation))
+
+        # State code resolution
+        if uri in entities.locations and exp.state_codes:
+            from src.ontology.contracts_expander import _get_notation, load_contracts_ontology
+            graph = load_contracts_ontology()
+            notation = _get_notation(graph, uri)
+            if notation:
+                steps.append(ResolutionStep(label="State code", value=notation))
+
+        # Agency name resolution
+        if uri in entities.service_branches and exp.agency_names:
+            steps.append(ResolutionStep(label="USAspending agency", value=exp.agency_names[0]))
+
+        # Contractor name resolution
+        if uri in entities.contractors and exp.contractor_names:
+            steps.append(ResolutionStep(label="Recipient search", value=exp.contractor_names[0]))
+
+        # USAspending result for first chain
+        if len(chains) == 0:
+            contract_fields = [s for s in structured_data if hasattr(s, 'key') and "Contract 1" in s.key and "Award" not in s.key]
+            if contract_fields:
+                steps.append(ResolutionStep(label="Top contract", value=contract_fields[0].value[:100]))
+
+        chains.append(ResolutionChain(input_term=input_term, steps=steps))
+
+    return chains
+
+
+@app.post("/api/contracts/query", response_model=QueryResponse)
+async def contracts_query(request: QueryRequest) -> QueryResponse:
+    """Run both basic and Ontology Enhanced RAG for a contract intelligence query."""
+    start = time.time()
+    client = LLMClient()
+
+    naive_result = generate_contracts_naive_answer(request.query, client=client)
+    enhanced_result = generate_contracts_enhanced_answer(request.query, client=client)
+
+    total_ms = (time.time() - start) * 1000
+
+    return QueryResponse(
+        query=request.query,
+        naive=_contracts_answer_to_result(naive_result, request.query),
+        enhanced=_contracts_answer_to_result(enhanced_result, request.query),
+        total_time_ms=total_ms,
+    )
+
+
+CONTRACTS_EXAMPLE_QUESTIONS = [
+    "What AI research contracts has the Army awarded near Redstone Arsenal?",
+    "Show me recent cybersecurity contracts from Lockheed Martin",
+    "What's the DoD spending on R&D in Colorado Springs?",
+    "Find contracts for autonomous systems at Aberdeen Proving Ground",
+    "What logistics contracts were awarded near Fort Liberty?",
+]
+
+
+@app.get("/api/contracts/examples")
+async def contracts_examples() -> list[str]:
+    """Return contract intelligence example questions."""
+    return CONTRACTS_EXAMPLE_QUESTIONS

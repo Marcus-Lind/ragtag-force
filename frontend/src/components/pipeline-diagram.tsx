@@ -1,9 +1,11 @@
 interface PipelineDiagramProps {
-  domain?: "benefits" | "tdy";
+  domain?: "benefits" | "tdy" | "contracts";
 }
 
 export function PipelineDiagram({ domain = "benefits" }: PipelineDiagramProps) {
-  const structuredLabel = domain === "tdy" ? "Per Diem Lookup" : "Structured Lookup";
+  const structuredLabel =
+    domain === "contracts" ? "USAspending API" :
+    domain === "tdy" ? "Per Diem Lookup" : "Structured Lookup";
 
   return (
     <div className="rounded-lg border bg-muted/30 px-5 py-4 mb-6 text-sm text-muted-foreground leading-loose">

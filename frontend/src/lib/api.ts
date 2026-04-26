@@ -103,3 +103,22 @@ export async function submitTDYQuery(query: string): Promise<QueryResponse> {
   }
   return res.json();
 }
+
+export async function fetchContractsExamples(): Promise<string[]> {
+  const res = await fetch(`${API_BASE}/api/contracts/examples`);
+  if (!res.ok) throw new Error(`Contracts examples fetch failed: ${res.status}`);
+  return res.json();
+}
+
+export async function submitContractsQuery(query: string): Promise<QueryResponse> {
+  const res = await fetch(`${API_BASE}/api/contracts/query`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Contracts query failed: ${err}`);
+  }
+  return res.json();
+}

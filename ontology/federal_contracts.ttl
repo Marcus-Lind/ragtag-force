@@ -1,0 +1,328 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex:   <http://ragtag-force.mil/ontology#> .
+
+# ============================================================================
+# RAG-Tag Force Federal Contract Intelligence Ontology
+# SKOS-based ontology for query expansion in defense procurement RAG system
+# Maps military jargon -> USAspending API query parameters
+# ============================================================================
+
+# -- Top-Level Concept Scheme ------------------------------------------------
+ex:FederalContracts a skos:ConceptScheme ;
+    skos:prefLabel "Federal Contract Intelligence Ontology"@en ;
+    skos:definition "SKOS ontology covering DoD service branches, research domains, military installations, defense contractors, contract types, and NAICS codes for federal procurement intelligence."@en .
+
+# -- Concept Classes (Top Concepts) ------------------------------------------
+ex:ServiceBranch a skos:Concept ;
+    skos:prefLabel "Service Branch"@en ;
+    skos:topConceptOf ex:FederalContracts ;
+    skos:definition "US military service branches mapped to USAspending agency names."@en .
+
+ex:ResearchDomain a skos:Concept ;
+    skos:prefLabel "Research Domain"@en ;
+    skos:topConceptOf ex:FederalContracts ;
+    skos:definition "Defense research and technology domains mapped to NAICS codes."@en .
+
+ex:ContractLocation a skos:Concept ;
+    skos:prefLabel "Contract Location"@en ;
+    skos:topConceptOf ex:FederalContracts ;
+    skos:definition "Military installations and defense hubs mapped to state codes."@en .
+
+ex:DefenseContractor a skos:Concept ;
+    skos:prefLabel "Defense Contractor"@en ;
+    skos:topConceptOf ex:FederalContracts ;
+    skos:definition "Major defense contractors with common aliases and abbreviations."@en .
+
+ex:ContractType a skos:Concept ;
+    skos:prefLabel "Contract Type"@en ;
+    skos:topConceptOf ex:FederalContracts ;
+    skos:definition "Federal contract pricing and award types."@en .
+
+ex:AcquisitionRegulation a skos:Concept ;
+    skos:prefLabel "Acquisition Regulation"@en ;
+    skos:topConceptOf ex:FederalContracts ;
+    skos:definition "Governing regulations for federal procurement."@en .
+
+# ============================================================================
+# SERVICE BRANCHES -> USAspending toptier agency names
+# ============================================================================
+
+ex:Army a skos:Concept ;
+    skos:prefLabel "Department of the Army"@en ;
+    skos:altLabel "Army"@en, "US Army"@en, "USA"@en, "DA"@en ;
+    skos:broader ex:ServiceBranch ;
+    skos:notation "021" ;
+    skos:definition "United States Army. USAspending toptier agency: Department of Defense."@en .
+
+ex:Navy a skos:Concept ;
+    skos:prefLabel "Department of the Navy"@en ;
+    skos:altLabel "Navy"@en, "US Navy"@en, "USN"@en ;
+    skos:broader ex:ServiceBranch ;
+    skos:notation "017" ;
+    skos:definition "United States Navy. USAspending toptier agency: Department of Defense."@en .
+
+ex:AirForce a skos:Concept ;
+    skos:prefLabel "Department of the Air Force"@en ;
+    skos:altLabel "Air Force"@en, "USAF"@en, "AF"@en ;
+    skos:broader ex:ServiceBranch ;
+    skos:notation "057" ;
+    skos:definition "United States Air Force. USAspending toptier agency: Department of Defense."@en .
+
+ex:Marines a skos:Concept ;
+    skos:prefLabel "United States Marine Corps"@en ;
+    skos:altLabel "Marines"@en, "USMC"@en, "Marine Corps"@en ;
+    skos:broader ex:ServiceBranch ;
+    skos:definition "US Marine Corps, under Department of the Navy."@en .
+
+ex:SpaceForce a skos:Concept ;
+    skos:prefLabel "United States Space Force"@en ;
+    skos:altLabel "Space Force"@en, "USSF"@en ;
+    skos:broader ex:ServiceBranch ;
+    skos:definition "US Space Force, under Department of the Air Force."@en .
+
+ex:DoD a skos:Concept ;
+    skos:prefLabel "Department of Defense"@en ;
+    skos:altLabel "DoD"@en, "DOD"@en, "Pentagon"@en, "OSD"@en, "Defense Department"@en ;
+    skos:broader ex:ServiceBranch ;
+    skos:definition "Overall Department of Defense toptier agency in USAspending."@en .
+
+# ============================================================================
+# RESEARCH DOMAINS -> NAICS codes + keywords
+# ============================================================================
+
+ex:AIResearch a skos:Concept ;
+    skos:prefLabel "Artificial Intelligence"@en ;
+    skos:altLabel "AI"@en, "AI/ML"@en, "machine learning"@en, "ML"@en,
+                  "deep learning"@en, "neural networks"@en, "autonomous systems"@en,
+                  "computer vision"@en, "NLP"@en, "natural language processing"@en ;
+    skos:broader ex:ResearchDomain ;
+    skos:notation "541715" ;
+    skos:definition "AI and machine learning R&D. NAICS 541715."@en ;
+    skos:related ex:CyberSecurity .
+
+ex:CyberSecurity a skos:Concept ;
+    skos:prefLabel "Cybersecurity"@en ;
+    skos:altLabel "cyber"@en, "cybersec"@en, "information security"@en,
+                  "infosec"@en, "CMMC"@en, "zero trust"@en, "network security"@en,
+                  "cyber defense"@en, "RMF"@en, "STIG"@en ;
+    skos:broader ex:ResearchDomain ;
+    skos:notation "541512" ;
+    skos:definition "Cybersecurity and information assurance. NAICS 541512."@en ;
+    skos:related ex:AIResearch .
+
+ex:LogisticsResearch a skos:Concept ;
+    skos:prefLabel "Logistics and Supply Chain"@en ;
+    skos:altLabel "logistics"@en, "supply chain"@en, "sustainment"@en,
+                  "maintenance"@en, "depot"@en, "MRO"@en ;
+    skos:broader ex:ResearchDomain ;
+    skos:notation "541614" ;
+    skos:definition "Logistics, supply chain management, and sustainment. NAICS 541614."@en .
+
+ex:C4ISR a skos:Concept ;
+    skos:prefLabel "C4ISR"@en ;
+    skos:altLabel "command and control"@en, "C2"@en, "ISR"@en,
+                  "intelligence surveillance reconnaissance"@en,
+                  "signals intelligence"@en, "SIGINT"@en, "ELINT"@en,
+                  "communications"@en, "tactical comms"@en ;
+    skos:broader ex:ResearchDomain ;
+    skos:notation "541330" ;
+    skos:definition "Command, control, communications, computers, ISR. NAICS 541330."@en .
+
+ex:SpaceResearch a skos:Concept ;
+    skos:prefLabel "Space Systems"@en ;
+    skos:altLabel "space"@en, "satellite"@en, "satellites"@en, "GPS"@en,
+                  "launch systems"@en, "orbital"@en, "space domain awareness"@en ;
+    skos:broader ex:ResearchDomain ;
+    skos:notation "541715" ;
+    skos:definition "Space systems research and satellite technology."@en .
+
+ex:HypersonicsResearch a skos:Concept ;
+    skos:prefLabel "Hypersonics"@en ;
+    skos:altLabel "hypersonic"@en, "hypersonic weapons"@en, "LRHW"@en,
+                  "Dark Eagle"@en, "boost-glide"@en, "scramjet"@en ;
+    skos:broader ex:ResearchDomain ;
+    skos:notation "541715" ;
+    skos:definition "Hypersonic weapons and propulsion research."@en .
+
+ex:BioDefense a skos:Concept ;
+    skos:prefLabel "Biodefense"@en ;
+    skos:altLabel "CBRN"@en, "chemical biological"@en, "biodefense"@en,
+                  "WMD"@en, "medical countermeasures"@en, "BARDA"@en ;
+    skos:broader ex:ResearchDomain ;
+    skos:notation "541714" ;
+    skos:definition "Chemical, biological, radiological, nuclear defense. NAICS 541714."@en .
+
+# ============================================================================
+# CONTRACT LOCATIONS -> state codes (for place_of_performance)
+# ============================================================================
+
+ex:HuntsvilleALContracts a skos:Concept ;
+    skos:prefLabel "Huntsville, AL"@en ;
+    skos:altLabel "Redstone Arsenal"@en, "AMCOM"@en, "PEO Missiles"@en,
+                  "MDA Huntsville"@en, "Missile Defense Agency"@en ;
+    skos:broader ex:ContractLocation ;
+    skos:notation "AL" ;
+    skos:definition "Huntsville, Alabama. Major defense hub: Redstone Arsenal, AMCOM, MDA."@en .
+
+ex:NorthernVA a skos:Concept ;
+    skos:prefLabel "Northern Virginia"@en ;
+    skos:altLabel "NoVA"@en, "Arlington"@en, "Crystal City"@en,
+                  "Pentagon"@en, "Fort Belvoir"@en, "Quantico"@en ;
+    skos:broader ex:ContractLocation ;
+    skos:notation "VA" ;
+    skos:definition "Northern Virginia / DC metro. Pentagon, Fort Belvoir, major contractor offices."@en .
+
+ex:SanDiegoCA a skos:Concept ;
+    skos:prefLabel "San Diego, CA"@en ;
+    skos:altLabel "SPAWAR"@en, "NAVWAR"@en, "Naval Base San Diego"@en,
+                  "Camp Pendleton"@en, "MCAS Miramar"@en ;
+    skos:broader ex:ContractLocation ;
+    skos:notation "CA" ;
+    skos:definition "San Diego, California. Major Navy and Marine Corps presence."@en .
+
+ex:ColoradoSprings a skos:Concept ;
+    skos:prefLabel "Colorado Springs, CO"@en ;
+    skos:altLabel "Peterson SFB"@en, "Schriever SFB"@en, "NORAD"@en,
+                  "NORTHCOM"@en, "Space Command"@en, "USSPACECOM"@en ;
+    skos:broader ex:ContractLocation ;
+    skos:notation "CO" ;
+    skos:definition "Colorado Springs area. US Space Command, NORTHCOM, NORAD."@en .
+
+ex:FortLibertyNC a skos:Concept ;
+    skos:prefLabel "Fort Liberty, NC"@en ;
+    skos:altLabel "Fort Bragg"@en, "Fort Liberty"@en, "Fayetteville"@en,
+                  "USASOC"@en, "XVIII Airborne Corps"@en, "82nd Airborne"@en ;
+    skos:broader ex:ContractLocation ;
+    skos:notation "NC" ;
+    skos:definition "Fort Liberty (formerly Fort Bragg), Fayetteville NC. USASOC, XVIII Airborne."@en .
+
+ex:TampaFL a skos:Concept ;
+    skos:prefLabel "Tampa, FL"@en ;
+    skos:altLabel "MacDill AFB"@en, "CENTCOM"@en, "SOCOM"@en,
+                  "USCENTCOM"@en, "USSOCOM"@en, "Special Operations Command"@en ;
+    skos:broader ex:ContractLocation ;
+    skos:notation "FL" ;
+    skos:definition "Tampa, Florida. CENTCOM and SOCOM headquarters at MacDill AFB."@en .
+
+ex:AberdeenMD a skos:Concept ;
+    skos:prefLabel "Aberdeen, MD"@en ;
+    skos:altLabel "Aberdeen Proving Ground"@en, "APG"@en, "DEVCOM"@en,
+                  "Army Research Lab"@en, "ARL"@en, "C5ISR Center"@en ;
+    skos:broader ex:ContractLocation ;
+    skos:notation "MD" ;
+    skos:definition "Aberdeen Proving Ground, Maryland. DEVCOM, ARL, C5ISR Center."@en .
+
+ex:DaytonOH a skos:Concept ;
+    skos:prefLabel "Dayton, OH"@en ;
+    skos:altLabel "Wright-Patterson AFB"@en, "WPAFB"@en, "AFRL"@en,
+                  "Air Force Research Lab"@en, "AFLCMC"@en ;
+    skos:broader ex:ContractLocation ;
+    skos:notation "OH" ;
+    skos:definition "Wright-Patterson AFB, Dayton OH. Air Force Research Lab, AFLCMC."@en .
+
+# ============================================================================
+# DEFENSE CONTRACTORS -> recipient search text
+# ============================================================================
+
+ex:LockheedMartin a skos:Concept ;
+    skos:prefLabel "Lockheed Martin Corporation"@en ;
+    skos:altLabel "Lockheed"@en, "Lockheed Martin"@en, "LMT"@en, "LM"@en,
+                  "Skunk Works"@en ;
+    skos:broader ex:DefenseContractor ;
+    skos:definition "Lockheed Martin Corporation. Largest US defense contractor."@en .
+
+ex:RTX a skos:Concept ;
+    skos:prefLabel "RTX Corporation"@en ;
+    skos:altLabel "Raytheon"@en, "RTX"@en, "Raytheon Technologies"@en,
+                  "Pratt & Whitney"@en, "Collins Aerospace"@en ;
+    skos:broader ex:DefenseContractor ;
+    skos:definition "RTX Corporation (formerly Raytheon Technologies)."@en .
+
+ex:NorthropGrumman a skos:Concept ;
+    skos:prefLabel "Northrop Grumman Systems Corporation"@en ;
+    skos:altLabel "Northrop"@en, "Northrop Grumman"@en, "NGC"@en, "NOC"@en ;
+    skos:broader ex:DefenseContractor ;
+    skos:definition "Northrop Grumman Corporation."@en .
+
+ex:Boeing a skos:Concept ;
+    skos:prefLabel "The Boeing Company"@en ;
+    skos:altLabel "Boeing"@en, "BA"@en ;
+    skos:broader ex:DefenseContractor ;
+    skos:definition "The Boeing Company. Major defense and aerospace contractor."@en .
+
+ex:GDIT a skos:Concept ;
+    skos:prefLabel "General Dynamics Information Technology, Inc."@en ;
+    skos:altLabel "GDIT"@en, "General Dynamics"@en, "GD"@en, "GD-IT"@en ;
+    skos:broader ex:DefenseContractor ;
+    skos:definition "General Dynamics Information Technology."@en .
+
+ex:BAE a skos:Concept ;
+    skos:prefLabel "BAE Systems"@en ;
+    skos:altLabel "BAE"@en, "BAE Systems Inc"@en ;
+    skos:broader ex:DefenseContractor ;
+    skos:definition "BAE Systems. Major international defense contractor."@en .
+
+ex:L3Harris a skos:Concept ;
+    skos:prefLabel "L3Harris Technologies, Inc."@en ;
+    skos:altLabel "L3Harris"@en, "L3"@en, "Harris"@en, "LHX"@en ;
+    skos:broader ex:DefenseContractor ;
+    skos:definition "L3Harris Technologies."@en .
+
+ex:Leidos a skos:Concept ;
+    skos:prefLabel "Leidos, Inc."@en ;
+    skos:altLabel "Leidos"@en, "SAIC"@en, "LDOS"@en ;
+    skos:broader ex:DefenseContractor ;
+    skos:definition "Leidos Inc. (formerly part of SAIC)."@en .
+
+# ============================================================================
+# CONTRACT TYPES
+# ============================================================================
+
+ex:FFP a skos:Concept ;
+    skos:prefLabel "Firm Fixed Price"@en ;
+    skos:altLabel "FFP"@en, "fixed price"@en, "firm-fixed-price"@en ;
+    skos:broader ex:ContractType ;
+    skos:definition "Firm Fixed Price contract. Contractor bears full cost risk."@en .
+
+ex:CPFF a skos:Concept ;
+    skos:prefLabel "Cost Plus Fixed Fee"@en ;
+    skos:altLabel "CPFF"@en, "cost-plus"@en, "cost reimbursement"@en, "cost type"@en ;
+    skos:broader ex:ContractType ;
+    skos:definition "Cost Plus Fixed Fee contract. Government reimburses costs plus negotiated fee."@en .
+
+ex:IDIQ a skos:Concept ;
+    skos:prefLabel "Indefinite Delivery Indefinite Quantity"@en ;
+    skos:altLabel "IDIQ"@en, "ID/IQ"@en, "task order"@en, "delivery order"@en ;
+    skos:broader ex:ContractType ;
+    skos:definition "IDIQ contract vehicle with task/delivery orders."@en .
+
+ex:BPA a skos:Concept ;
+    skos:prefLabel "Blanket Purchase Agreement"@en ;
+    skos:altLabel "BPA"@en, "blanket purchase"@en ;
+    skos:broader ex:ContractType ;
+    skos:definition "Blanket Purchase Agreement for recurring purchases."@en .
+
+# ============================================================================
+# ACQUISITION REGULATIONS
+# ============================================================================
+
+ex:FAR a skos:Concept ;
+    skos:prefLabel "Federal Acquisition Regulation"@en ;
+    skos:altLabel "FAR"@en ;
+    skos:broader ex:AcquisitionRegulation ;
+    skos:definition "FAR - primary regulation governing federal procurement."@en .
+
+ex:DFARS a skos:Concept ;
+    skos:prefLabel "Defense Federal Acquisition Regulation Supplement"@en ;
+    skos:altLabel "DFARS"@en ;
+    skos:broader ex:AcquisitionRegulation ;
+    skos:definition "DFARS - DoD supplement to the FAR."@en .
+
+ex:SAP a skos:Concept ;
+    skos:prefLabel "Simplified Acquisition Procedures"@en ;
+    skos:altLabel "SAP"@en, "simplified acquisition"@en ;
+    skos:broader ex:AcquisitionRegulation ;
+    skos:related ex:FAR ;
+    skos:definition "FAR Part 13 simplified acquisition for purchases under $250K threshold."@en .

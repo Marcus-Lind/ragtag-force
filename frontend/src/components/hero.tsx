@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 
 interface HeroProps {
-  domain?: "benefits" | "tdy";
+  domain?: "benefits" | "tdy" | "contracts";
 }
 
 const DESCRIPTIONS: Record<string, string> = {
@@ -9,6 +9,8 @@ const DESCRIPTIONS: Record<string, string> = {
     "Compare basic RAG against Ontology Enhanced RAG for military benefits and entitlements. See how SKOS knowledge graphs dramatically improve retrieval accuracy.",
   tdy:
     "Compare basic RAG against Ontology Enhanced RAG for TDY travel planning. See how ontology-driven per diem lookups and JTR knowledge deliver precise travel guidance.",
+  contracts:
+    "Compare basic RAG against Ontology Enhanced RAG for defense contract intelligence. See how the ontology resolves military jargon into USAspending.gov API queries to surface real contract data.",
 };
 
 export function Hero({ domain = "benefits" }: HeroProps) {

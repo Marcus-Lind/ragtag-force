@@ -6,8 +6,10 @@ import {
   fetchStatus,
   fetchExamples,
   fetchTDYExamples,
+  fetchContractsExamples,
   submitQuery,
   submitTDYQuery,
+  submitContractsQuery,
   type StatusResponse,
   type QueryResponse,
 } from "@/lib/api";
@@ -17,7 +19,7 @@ import { QueryInput } from "@/components/query-input";
 import { AnswerCard } from "@/components/answer-card";
 import { Sidebar } from "@/components/sidebar";
 
-type Domain = "benefits" | "tdy";
+type Domain = "benefits" | "tdy" | "contracts";
 
 const DOMAIN_CONFIG: Record<Domain, { label: string; icon: string; placeholder: string }> = {
   benefits: {
@@ -30,6 +32,11 @@ const DOMAIN_CONFIG: Record<Domain, { label: string; icon: string; placeholder: 
     icon: "✈️",
     placeholder: "Ask about TDY travel, per diem rates, or transportation...",
   },
+  contracts: {
+    label: "Contract Intelligence",
+    icon: "📊",
+    placeholder: "Ask about defense contracts, spending, or procurement...",
+  },
 };
 
 export default function Home() {
@@ -37,6 +44,7 @@ export default function Home() {
   const [status, setStatus] = useState<StatusResponse | null>(null);
   const [benefitsExamples, setBenefitsExamples] = useState<string[]>([]);
   const [tdyExamples, setTdyExamples] = useState<string[]>([]);
+  const [contractsExamples, setContractsExamples] = useState<string[]>([]);
   const [result, setResult] = useState<QueryResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +53,7 @@ export default function Home() {
     fetchStatus().then(setStatus).catch(() => setStatus(null));
     fetchExamples().then(setBenefitsExamples).catch(() => setBenefitsExamples([]));
     fetchTDYExamples().then(setTdyExamples).catch(() => setTdyExamples([]));
+    fetchContractsExamples().then(setContractsExamples).catch(() => setContractsExamples([]));
   }, []);
 
   const handleDomainChange = useCallback((d: Domain) => {
@@ -57,7 +66,7 @@ export default function Home() {
     setLoading(true);
     setError(null);
     try {
-      const fn = domain === "tdy" ? submitTDYQuery : submitQuery;
+      const fn = domain === "contracts" ? submitContractsQuery : domain === "tdy" ? submitTDYQuery : submitQuery;
       const res = await fn(query);
       setResult(res);
     } catch (e) {
@@ -67,7 +76,7 @@ export default function Home() {
     }
   };
 
-  const currentExamples = domain === "tdy" ? tdyExamples : benefitsExamples;
+  const currentExamples = domain === "contracts" ? contractsExamples : domain === "tdy" ? tdyExamples : benefitsExamples;
   const config = DOMAIN_CONFIG[domain];
 
   return (
