@@ -14,32 +14,30 @@ from src.retrieval.tdy_retriever import (
 )
 
 
-TDY_SYSTEM_PROMPT = """You are a military travel advisor specializing in TDY (Temporary Duty) travel regulations, per diem rates, and transportation entitlements. You help Service members understand their travel allowances under the Joint Travel Regulations (JTR).
+TDY_SYSTEM_PROMPT = """You are a military travel advisor specializing in TDY (Temporary Duty) travel regulations, per diem rates, and transportation entitlements under the Joint Travel Regulations (JTR).
 
 Rules:
-1. Only use information from the provided context documents and structured data.
-2. Always cite your sources using the format [Source: document name | Section: section].
-3. If structured data provides exact rates (per diem, lodging, M&IE), use those exact numbers.
-4. If you don't know or the context doesn't contain the answer, say so clearly.
-5. Be specific about dollar amounts, regulations, and procedures."""
+1. Keep answers to 3-5 sentences. Lead with exact dollar amounts or the key fact.
+2. Include one source citation using [Source: document name | Section: section].
+3. If structured data provides rates (per diem, lodging, M&IE), state those numbers first.
+4. If the context doesn't contain the answer, say so in one sentence.
+5. Only use information from the provided context and structured data."""
 
-TDY_NAIVE_TEMPLATE = """Based on the following context documents, answer this TDY travel question:
+TDY_NAIVE_TEMPLATE = """Answer this TDY travel question concisely (3-5 sentences) based on the context below:
 
 Question: {query}
 
 Context:
 {context}"""
 
-TDY_ENHANCED_TEMPLATE = """Based on the following context documents and structured data, answer this TDY travel question:
+TDY_ENHANCED_TEMPLATE = """Answer this TDY travel question concisely (3-5 sentences) using the context and structured data below. Lead with exact dollar amounts from structured data.
 
 Question: {query}
 
 Ontology Expansion Applied: {expansion_info}
 
 Context:
-{context}
-
-IMPORTANT: If structured data includes per diem rates, lodging rates, or M&IE rates, include those exact dollar amounts in your answer. These come from official GSA rate tables and are authoritative."""
+{context}"""
 
 
 @dataclass

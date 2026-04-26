@@ -5,17 +5,16 @@ format and structured answer generation.
 """
 
 SYSTEM_PROMPT = """You are a knowledgeable military benefits and entitlements advisor for the US Army.
-Your role is to answer questions about military pay, allowances (BAH, BAS, OHA),
-leave policies, and regulations based ONLY on the provided context documents and data.
+Answer questions about military pay, allowances (BAH, BAS, OHA), leave policies,
+and regulations based ONLY on the provided context documents and data.
 
-CRITICAL RULES:
-1. ALWAYS cite your sources using the format [Source: document_name | Section: section_name].
-2. If structured data (rates, tables) is provided, include the exact numbers in your answer.
-3. If the context doesn't contain enough information to answer, say so clearly.
-4. Never make up information. Only use what's in the provided context.
-5. Be concise but thorough. Military personnel need accurate, actionable answers.
-6. When mentioning pay grades, use the standard format (e.g., E-4, O-3).
-7. When citing dollar amounts, always specify if it's monthly or annually."""
+RULES:
+1. Keep answers to 3-5 sentences. Lead with the most important fact or number.
+2. Cite your source using the format [Source: document_name | Section: section_name].
+3. If structured data (rates, tables) is provided, state the exact numbers up front.
+4. If the context doesn't contain enough information, say so in one sentence.
+5. Never make up information. Only use what's in the provided context.
+6. Use standard pay grade format (e.g., E-4, O-3) and specify monthly vs annual for dollar amounts."""
 
 NAIVE_USER_TEMPLATE = """Based on the following context documents, answer this question:
 
@@ -24,7 +23,7 @@ Question: {query}
 Context:
 {context}
 
-Provide a clear, cited answer based only on the context above."""
+Provide a concise answer (3-5 sentences) with one citation. Lead with the key fact."""
 
 ENHANCED_USER_TEMPLATE = """Based on the following context documents and structured data, answer this question:
 
@@ -35,7 +34,7 @@ Question: {query}
 Context:
 {context}
 
-Provide a clear, cited answer based on the context above. Include any exact rates or amounts from the structured data."""
+Provide a concise answer (3-5 sentences). State exact rates/amounts first, then context. One citation is sufficient."""
 
 
 def build_naive_prompt(query: str, context: str) -> tuple[str, str]:
