@@ -36,6 +36,7 @@ export interface AnswerResult {
   document_count: number;
   sources: string[];
   structured_data: StructuredDataItem[];
+  structured_query: string;
   expansion: ExpansionDetail | null;
   search_query: string;
   avg_distance: number | null;

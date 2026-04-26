@@ -92,6 +92,7 @@ class AnswerResult(BaseModel):
     document_count: int = 0
     sources: list[str] = []
     structured_data: list[StructuredDataItem] = []
+    structured_query: str = ""
     expansion: Optional[ExpansionDetail] = None
     search_query: str = ""
     avg_distance: Optional[float] = None
@@ -279,6 +280,21 @@ def _rag_answer_to_result(rag_answer: Any, original_query: str) -> AnswerResult:
     # Build resolution chains
     chains = _build_resolution_chains(rag_answer, structured_data)
 
+    # Build structured query description showing what the ontology enabled
+    structured_query = ""
+    if is_enhanced and rag_answer.retrieval.expansion:
+        exp = rag_answer.retrieval.expansion
+        parts = []
+        if exp.grade_notations:
+            parts.append(f"grade = '{exp.grade_notations[0]}'")
+        if exp.locality_codes:
+            parts.append(f"locality_code = '{exp.locality_codes[0]}'")
+        if exp.dependency_statuses:
+            dep = exp.dependency_statuses[0].replace("_", " ").title()
+            parts.append(f"dependency = '{dep}'")
+        if parts:
+            structured_query = f"SELECT * FROM bah_rates WHERE {' AND '.join(parts)}"
+
     return AnswerResult(
         answer=rag_answer.answer,
         error=rag_answer.error,
@@ -286,6 +302,7 @@ def _rag_answer_to_result(rag_answer: Any, original_query: str) -> AnswerResult:
         document_count=len(rag_answer.retrieval.documents),
         sources=rag_answer.sources,
         structured_data=structured_data,
+        structured_query=structured_query,
         expansion=expansion,
         search_query=search_q[:300],
         avg_distance=avg_dist,
@@ -461,6 +478,20 @@ def _tdy_answer_to_result(tdy_answer: Any, original_query: str) -> AnswerResult:
     # Build resolution chains
     chains = _build_resolution_chains(tdy_answer, structured_data)
 
+    # Build structured query description
+    structured_query = ""
+    if is_enhanced and tdy_answer.retrieval.expansion:
+        exp = tdy_answer.retrieval.expansion
+        if exp.location_codes:
+            code = exp.location_codes[0]
+            parts = code.split("_")
+            if len(parts) >= 2:
+                state = parts[-1]
+                city = " ".join(parts[:-1]).title()
+            else:
+                city, state = code, ""
+            structured_query = f"GET api.gsa.gov/travel/perdiem/rates/city/{city}/state/{state}/year/2026"
+
     return AnswerResult(
         answer=tdy_answer.answer,
         error=tdy_answer.error,
@@ -468,6 +499,7 @@ def _tdy_answer_to_result(tdy_answer: Any, original_query: str) -> AnswerResult:
         document_count=len(tdy_answer.retrieval.documents),
         sources=tdy_answer.sources,
         structured_data=structured_data,
+        structured_query=structured_query,
         expansion=expansion,
         search_query=search_q[:300],
         avg_distance=avg_dist,
@@ -590,6 +622,23 @@ def _contracts_answer_to_result(contracts_answer: Any, original_query: str) -> A
     # Build resolution chains for contracts
     chains = _build_contracts_resolution_chains(contracts_answer, structured_data)
 
+    # Build structured query description
+    structured_query = ""
+    if is_enhanced and contracts_answer.retrieval.expansion:
+        exp = contracts_answer.retrieval.expansion
+        api_parts = []
+        if exp.expanded_terms:
+            # Find the keywords that were actually sent to the API
+            domain_terms = [t for t in exp.expanded_terms[:3] if len(t) > 3]
+            if domain_terms:
+                api_parts.append(f"keywords=[{', '.join(repr(t) for t in domain_terms[:2])}]")
+        if exp.state_codes:
+            api_parts.append(f"state_code='{exp.state_codes[0]}'")
+        if exp.contractor_names:
+            api_parts.append(f"recipient='{exp.contractor_names[0]}'")
+        if api_parts:
+            structured_query = f"POST api.usaspending.gov/api/v2/search/spending_by_award ({', '.join(api_parts)})"
+
     return AnswerResult(
         answer=contracts_answer.answer,
         error=contracts_answer.error,
@@ -597,6 +646,7 @@ def _contracts_answer_to_result(contracts_answer: Any, original_query: str) -> A
         document_count=len(contracts_answer.retrieval.documents),
         sources=contracts_answer.sources,
         structured_data=structured_data,
+        structured_query=structured_query,
         expansion=expansion,
         search_query=search_q[:300],
         avg_distance=avg_dist,
